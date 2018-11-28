@@ -5,14 +5,8 @@
             body { 
                 margin: 0; 
                 font-family: Verdana; 
+                background-color: #192533;
             }  
-            #overlay { 
-                position: absolute; 
-                color: #fff; 
-                padding: 20px; 
-                width: 160px;
-                display: none; 
-            }
             #heightmap_canvas { 
                 display: none; 
             }
@@ -23,11 +17,6 @@
         <style type="text/css"></style>
     </head> 
     <body> 
-        <div id="overlay">
-            <p>
-                <a href="js/app.js">JS-Source</a>
-            </p>
-        </div>
         <div id="assets">
             <img id="heightmap-image" src="assets/terrain_256.png" alt="Heightmap" height="101" width="101">
             <canvas id="heightmap_canvas"></canvas>

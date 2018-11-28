@@ -73,6 +73,11 @@ function preloadTextures() {
     treeTexture = textureLoader.load("assets/evergreen_s.jpg");
 }
 
+window.addEventListener('resize', function () {
+    window.location.reload();
+}, false);
+
+
 function setUpRenderer() {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -107,7 +112,11 @@ function addTrees() {
         let tree = buildTree(treeTexture);
         tree.position.set(randomVertex.x, randomVertex.y, randomVertex.z);
         // don't land in a tree
-        if(camera.position.distanceTo(tree.position) < 500){i--;continue;};
+        if (camera.position.distanceTo(tree.position) < 500) {
+            i--;
+            continue;
+        }
+        ;
         tree.scale.y = tree.scale.x = tree.scale.z = 10;
         tree.receiveShadow = true;
         tree.castShadow = true;
@@ -171,7 +180,7 @@ function addLights() {
 
     // SIMULATED MOONLIGHT
     var directionalLight = new THREE.DirectionalLight(0x455767, 1);
-    directionalLight.position.set(-GROUND_SIZE/2, 3000, 0);
+    directionalLight.position.set(-GROUND_SIZE / 2, 3000, 0);
     directionalLight.castShadow = true;
     directionalLight.shadow.camera.left = -5000;
     directionalLight.shadow.camera.bottom = -5000;
@@ -181,7 +190,7 @@ function addLights() {
     directionalLight.shadow.mapSize.width = 2048;  // default
     directionalLight.shadow.mapSize.height = 2048; // default
     directionalLight.shadow.camera.near = 0.5;    // default
-    directionalLight.shadow.camera.far = GROUND_SIZE*2;     // default
+    directionalLight.shadow.camera.far = GROUND_SIZE * 2;     // default
 
     scene.add(directionalLight);
 }
@@ -387,7 +396,7 @@ function upDateParticles() {
         var object = scene.children[ i ];
         if (object instanceof THREE.Points) {
             object.position.y -= object.userData.speed;
-            if (object.position.y < -(SKY_HEIGHT-1000)) {
+            if (object.position.y < -(SKY_HEIGHT - 1000)) {
                 object.position.y = 0;
             }
         }
