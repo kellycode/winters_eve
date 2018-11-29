@@ -411,13 +411,6 @@ function render() {
     upDateParticles();
 
     controls.updateCameraMotion();
-    
-//    var renC = document.getElementById("render_canvas");
-//    //var ctx=c.getContext("2d");
-//    var img = document.getElementById("wasd");
-//    renC.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-//    //renderer.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-//    //ctx.drawImage(img, 10, 10);
 
     requestAnimationFrame(render);
     renderer.render(scene, camera);
