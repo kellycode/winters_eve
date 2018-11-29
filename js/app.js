@@ -47,24 +47,19 @@ function preloadTextures() {
 
     textureManager.onStart = function (item, loaded, total) {
         // this gets called after any item has been loaded
-        console.log('loading ' + item);
     };
 
     textureManager.onLoad = function (a, b, c) {
         // all textures are loaded
-        console.log('onload says - all textures loaded');
-        // TODO: DECIDE TO USE THIS OR NOT
-        var imagedata = getImageData(heightMapImage.image); //<-- error occurs here
         loadScene();
     };
 
     textureManager.onProgress = function (item, loaded, total) {
         // this gets called after any item has been loaded
-        console.log('onProgress says - ' + item);
     };
 
     textureManager.onError = function (url) {
-        console.error('Failed to load ' + url)
+        console.error('Failed to load texture ' + url)
     };
 
     groundTextureMap = textureLoader.load("assets/snow_big.jpg");
@@ -111,12 +106,11 @@ function addTrees() {
         var randomVertex = vertices[Math.floor(Math.random() * vertices.length)];
         let tree = buildTree(treeTexture);
         tree.position.set(randomVertex.x, randomVertex.y, randomVertex.z);
-        // don't land in a tree
+        // don't land camera in a tree
         if (camera.position.distanceTo(tree.position) < 500) {
             i--;
             continue;
         }
-        ;
         tree.scale.y = tree.scale.x = tree.scale.z = 10;
         tree.receiveShadow = true;
         tree.castShadow = true;
@@ -124,17 +118,15 @@ function addTrees() {
     }
 }
 
+function getRangeRandom(min, max) {
+    return min + Math.random() * (max - min);
+}
+
 function addFallingSnow() {
+    
+    let NUM_STORMS = 5;
 
-    let snowParameters = [
-        [[1.0, 0.2, 0.5], snowFlakeImage, 20],
-        [[0.95, 0.1, 0.5], snowFlakeImage, 17],
-        [[0.90, 0.05, 0.5], snowFlakeImage, 10],
-        [[0.85, 0, 0.5], snowFlakeImage, 15],
-        [[0.80, 0, 0.5], snowFlakeImage, 10]
-    ];
-
-    for (let i = 0; i < snowParameters.length; i++) {
+    for (let i = 0; i < NUM_STORMS; i++) {
         let snowVertices = [];
         let snowGeometry = new THREE.BufferGeometry();
 
@@ -147,15 +139,9 @@ function addFallingSnow() {
 
         snowGeometry.addAttribute('position', new THREE.Float32BufferAttribute(snowVertices, 3));
 
-        var color = snowParameters[ i ][ 0 ];
-        var sprite = snowParameters[ i ][ 1 ];
-        var size = Math.random() * 10 + 10;//snowParameters[ i ][ 2 ];
+        var size = getRangeRandom(10, 20);
 
-        function rand(min, max) {
-            return min + Math.random() * (max - min);
-        }
-
-        snowMaterials[ i ] = new THREE.PointsMaterial({size: size, map: sprite, blending: THREE.AdditiveBlending, depthTest: false, transparent: true});
+        snowMaterials[ i ] = new THREE.PointsMaterial({size: size, map: snowFlakeImage, blending: THREE.AdditiveBlending, depthTest: false, transparent: true});
         snowMaterials[ i ].color.setHSL(0, 0, Math.random());
 
         var particles = new THREE.Points(snowGeometry, snowMaterials[ i ]);
@@ -163,7 +149,7 @@ function addFallingSnow() {
         particles.position.x = -GROUND_SIZE / 2;
         particles.position.z = -GROUND_SIZE / 2;
 
-        particles.userData.speed = Math.random() * 2 + 1;
+        particles.userData.speed = getRangeRandom(1, 2);
 
         scene.add(particles);
     }
@@ -219,7 +205,7 @@ function setupCamera() {
  */
 function getTerrainPixelData()
 {
-    let img = document.getElementById("heightmap-image");
+    let img = document.getElementById("heightmap_image");
     let canvas = document.getElementById("heightmap_canvas");
 
     canvas.width = img.width;
