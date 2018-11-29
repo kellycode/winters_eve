@@ -31,17 +31,17 @@ const DOWN_VECTOR = new THREE.Vector3(0, -1, 0);
 const GROUND_SIZE = 10000;
 const SKY_HEIGHT = 3000;
 
-function getImageData(image) {
-
-    var canvas = document.createElement('canvas');
-    canvas.width = image.width;
-    canvas.height = image.height;
-
-    var context = canvas.getContext('2d');
-    context.drawImage(image, 0, 0);
-
-    return context.getImageData(0, 0, image.width, image.height);
-}
+//function getImageData(image) {
+//
+//    var canvas = document.createElement('canvas');
+//    canvas.width = image.width;
+//    canvas.height = image.height;
+//
+//    var context = canvas.getContext('2d');
+//    context.drawImage(image, 0, 0);
+//
+//    return context.getImageData(0, 0, image.width, image.height);
+//}
 
 function preloadTextures() {
 
@@ -88,6 +88,7 @@ function setUpRenderer() {
     renderer.shadowMapHeight = 1024;
     renderer.shadowMapDebug = false;
 
+    renderer.domElement.id = "render_canvas";
     document.body.appendChild(renderer.domElement);
 }
 
@@ -260,7 +261,7 @@ function getTerrainPixelData()
     let terrain = {
         data: normPixels,
         segs: img.width - 1
-    }
+    };
 
     return terrain;
 }
@@ -410,6 +411,13 @@ function render() {
     upDateParticles();
 
     controls.updateCameraMotion();
+    
+//    var renC = document.getElementById("render_canvas");
+//    //var ctx=c.getContext("2d");
+//    var img = document.getElementById("wasd");
+//    renC.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+//    //renderer.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+//    //ctx.drawImage(img, 10, 10);
 
     requestAnimationFrame(render);
     renderer.render(scene, camera);
