@@ -69,7 +69,9 @@ function preloadTextures() {
 }
 
 window.addEventListener('resize', function () {
-    window.location.reload();
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
 }, false);
 
 
@@ -123,7 +125,7 @@ function getRangeRandom(min, max) {
 }
 
 function addFallingSnow() {
-    
+
     let NUM_STORMS = 5;
 
     for (let i = 0; i < NUM_STORMS; i++) {
