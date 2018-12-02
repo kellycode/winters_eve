@@ -1,13 +1,22 @@
-//'use strict';
+'use strict';
 
 if (!THREE) {
     var THREE = {};
     alert('THREE is not loaded');
 }
 
+// CONSTANTS
+const TERRAIN_HEIGHT_MOD = 2;
+const CAMERA_HEIGHT = 100;
+const DOWN_VECTOR = new THREE.Vector3(0, -1, 0);
+const GROUND_SIZE = 10000;
+const SKY_HEIGHT = 3000;
+const MOON_SCALE = 1000;
+const MOON_POS = new THREE.Vector3(-GROUND_SIZE * 2, GROUND_SIZE * 2 / 2, 0);
+const MOONLIGHT_POS = new THREE.Vector3(-GROUND_SIZE, GROUND_SIZE / 2, 0);
+
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
-camera.up.set(0, 0, 1);
+var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, GROUND_SIZE * 5);
 var renderer;
 var raycaster = new THREE.Raycaster();
 var ground_mesh;
@@ -16,21 +25,28 @@ var particles;
 var snowMaterials = [];
 var loading = '';
 
+// LIGHTS
+var directionalLight;
+var ambientLight;
+
 // TEXTURE ITEMS
 var textureManager = new THREE.LoadingManager();
 var textureLoader = new THREE.TextureLoader(textureManager);
 var groundTextureMap;
-var heightMapImage;
 var snowFlakeImage;
 var treeTexture;
+var moonSprite;
 
-// CONSTANTS
-// modify heightmap hills
-const TERRAIN_HEIGHT_MOD = 2;
-const CAMERA_HEIGHT = 100;
-const DOWN_VECTOR = new THREE.Vector3(0, -1, 0);
-const GROUND_SIZE = 10000;
-const SKY_HEIGHT = 3000;
+function loadScene() {
+    setUpRenderer();
+    setupCamera();
+    addLights();
+    addGround();
+    addTrees();
+    addFallingSnow();
+    addMoon();
+    render();
+}
 
 function updateLoadingPercent() {
     loading = document.getElementById("load_percent").innerHTML;
@@ -64,9 +80,8 @@ function preloadTextures() {
         console.error('Failed to load texture ' + url)
     };
 
-    groundTextureMap = textureLoader.load("assets/snow_big.jpg");
-    heightMapImage = textureLoader.load("assets/Heightmap3.png");
-    snowFlakeImage = textureLoader.load("assets/spark1.png");
+    groundTextureMap = textureLoader.load("assets/snow_ground.jpg");
+    snowFlakeImage = textureLoader.load("assets/snowflake.png");
     treeTexture = textureLoader.load("assets/evergreen_s.jpg");
 }
 
@@ -94,14 +109,13 @@ function setUpRenderer() {
     document.body.appendChild(renderer.domElement);
 }
 
-function loadScene() {
-    setUpRenderer();
-    setupCamera();
-    addLights();
-    addGround();
-    addTrees();
-    addFallingSnow();
-    render();
+function addMoon() {
+    var spriteMap = new THREE.TextureLoader().load("assets/moon_sd.png");
+    var spriteMaterial = new THREE.SpriteMaterial({map: spriteMap, color: 0xffffff});
+    moonSprite = new THREE.Sprite(spriteMaterial);
+    moonSprite.position.copy(MOON_POS);
+    moonSprite.scale.set(MOON_SCALE, MOON_SCALE, 1);
+    scene.add(moonSprite);
 }
 
 function addTrees() {
@@ -166,12 +180,12 @@ function init() {
 
 function addLights() {
     //  LOW EVENING LIGHT
-    var ambientLight = new THREE.AmbientLight(0x222222);
+    ambientLight = new THREE.AmbientLight(0x222222);
     scene.add(ambientLight);
 
     // SIMULATED MOONLIGHT
-    var directionalLight = new THREE.DirectionalLight(0x455767, 1);
-    directionalLight.position.set(-GROUND_SIZE / 2, 3000, 0);
+    directionalLight = new THREE.DirectionalLight(0x455767, 1);
+    directionalLight.position.copy(MOONLIGHT_POS);
     directionalLight.castShadow = true;
     directionalLight.shadow.camera.left = -5000;
     directionalLight.shadow.camera.bottom = -5000;
@@ -184,6 +198,10 @@ function addLights() {
     directionalLight.shadow.camera.far = GROUND_SIZE * 2;     // default
 
     scene.add(directionalLight);
+
+    //Create a helper for the shadow camera (optional)
+    //var helper = new THREE.CameraHelper(directionalLight.shadow.camera);
+    //scene.add(helper);
 }
 
 /**
