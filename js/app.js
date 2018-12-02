@@ -14,6 +14,7 @@ var ground_mesh;
 var controls = new SimpleWASDControls(camera, document);
 var particles;
 var snowMaterials = [];
+var loading = '';
 
 // TEXTURE ITEMS
 var textureManager = new THREE.LoadingManager();
@@ -31,22 +32,21 @@ const DOWN_VECTOR = new THREE.Vector3(0, -1, 0);
 const GROUND_SIZE = 10000;
 const SKY_HEIGHT = 3000;
 
-//function getImageData(image) {
-//
-//    var canvas = document.createElement('canvas');
-//    canvas.width = image.width;
-//    canvas.height = image.height;
-//
-//    var context = canvas.getContext('2d');
-//    context.drawImage(image, 0, 0);
-//
-//    return context.getImageData(0, 0, image.width, image.height);
-//}
+function updateLoadingPercent() {
+    loading = document.getElementById("load_percent").innerHTML;
+    loading = parseInt(loading) + 20;
+    document.getElementById("load_percent").innerHTML = loading;
+    if (loading === 100) {
+        var elem = document.querySelector("#loading_info");
+        elem.style.display = 'none';
+    }
+}
 
 function preloadTextures() {
 
     textureManager.onStart = function (item, loaded, total) {
         // this gets called after any item has been loaded
+        updateLoadingPercent();
     };
 
     textureManager.onLoad = function (a, b, c) {
@@ -56,6 +56,8 @@ function preloadTextures() {
 
     textureManager.onProgress = function (item, loaded, total) {
         // this gets called after any item has been loaded
+        console.log(item)
+        updateLoadingPercent();
     };
 
     textureManager.onError = function (url) {
@@ -413,6 +415,7 @@ function render() {
     controls.updateCameraMotion();
 
     requestAnimationFrame(render);
+
     renderer.render(scene, camera);
 }
 

@@ -14,7 +14,13 @@
                 margin: 0; 
                 font-family: Verdana; 
                 background-color: #192533;
-            }  
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            #loading_info {
+                color: antiquewhite;
+            }
             #heightmap_canvas { 
                 display: none; 
             }
@@ -49,7 +55,8 @@
         </style> 
         <style type="text/css"></style>
     </head> 
-    <body> 
+    <body>
+        <h2 id="loading_info">Loading&nbsp;<span id="load_percent">0</span>%</h2>
         <img id="heightmap_image" src="assets/terrain_256.png" alt="Heightmap" height="101" width="101">
         <canvas id="heightmap_canvas"></canvas>
         <img id="wasd" src="assets/wasd_gamer.png" alt=""/>
