@@ -37,12 +37,20 @@ var snowFlakeImage;
 var treeTexture;
 var moonSprite;
 
+// ANIMATIONS
+var wolfAnimMixer, deerAnimMixer;
+var clock_deer = new THREE.Clock();
+var clock_wolf = new THREE.Clock();
+var jsonLoader = new THREE.JSONLoader( );
+var mesh;
+
 function loadScene() {
     setUpRenderer();
     setupCamera();
     addLights();
     addGround();
     addTrees();
+    addAnimals();
     addFallingSnow();
     addMoon();
     render();
@@ -50,7 +58,7 @@ function loadScene() {
 
 function updateLoadingPercent() {
     loading = document.getElementById("load_percent").innerHTML;
-    loading = parseInt(loading) + 20;
+    loading = parseInt(loading) + 16;
     document.getElementById("load_percent").innerHTML = loading;
     if (loading === 100) {
         var elem = document.querySelector("#loading_info");
@@ -62,6 +70,7 @@ function preloadTextures() {
 
     textureManager.onStart = function (item, loaded, total) {
         // this gets called after any item has been loaded
+        // 1
         updateLoadingPercent();
     };
 
@@ -73,6 +82,7 @@ function preloadTextures() {
     textureManager.onProgress = function (item, loaded, total) {
         // this gets called after any item has been loaded
         console.log(item)
+        // 2,3,4
         updateLoadingPercent();
     };
 
@@ -137,13 +147,84 @@ function addTrees() {
     }
 }
 
+function addAnimals() {
+    wolfAnimMixer = new THREE.AnimationMixer(scene);
+    deerAnimMixer = new THREE.AnimationMixer(scene);
+    
+    let vertices = ground_mesh.geometry.vertices;
+    let highPoint = new THREE.Vector3(0, 0, 0);
+
+    // the highest y is the hill top for the wolf
+    for (let i = 0; i < vertices.length; i++) {
+        if (vertices[i].y > highPoint.y) {
+            highPoint.copy(vertices[i]);
+        }
+    }
+
+    // add the wolf
+    var wolfLoader = function (geometry, materials) {
+        // 5
+        updateLoadingPercent();
+        var material = materials[ 0 ];
+        material.morphTargets = true;
+        material.color.setHex(0x8b6e4f);
+        let mesh = new THREE.Mesh(geometry, materials);
+        // set on the hilltop
+        mesh.position.copy(highPoint);
+        // TODO: move this to model
+        let scale = 20;
+        mesh.scale.set(scale, scale, scale);
+        mesh.rotation.y = THREE.Math.randFloat(-1,1);
+        mesh.castShadow = true;
+        mesh.updateMatrix();
+        mesh.geometry.computeVertexNormals();
+        scene.add(mesh);
+        
+        wolfAnimMixer.clipAction(mesh.geometry.animations[ 0 ], mesh)
+                .setDuration(2)
+                .startAt(0)
+                .play();
+
+    };
+    jsonLoader.load('assets/models/wolf_sitting.js', wolfLoader);
+
+    // add a few deer
+    function createDeer(deerGeometry, materials) {
+        // 6
+        updateLoadingPercent();
+        var material = materials[ 0 ];
+        material.morphTargets = true;
+        material.color.setHex(0x774f25);
+
+        for (var i = 0; i < 10; i++) {
+            var mesh = new THREE.Mesh(deerGeometry, materials);
+            var scale = 10;
+            mesh.scale.set(scale, scale, scale);
+            var randomVertex = vertices[Math.floor(Math.random() * vertices.length)];
+            mesh.position.set(randomVertex.x, randomVertex.y + 50, randomVertex.z);
+            mesh.rotation.set(0, Math.random() * Math.PI, 0);
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            mesh.geometry.dynamic = true;
+            mesh.geometry.computeVertexNormals();
+            scene.add(mesh);
+            deerAnimMixer.clipAction(deerGeometry.animations[ 0 ], mesh)
+                    .setDuration(10)			// one second
+                    .startAt(0)	// random phase (already running)
+                    .play();
+        }
+
+    }
+    jsonLoader.load("assets/models/deer.js", createDeer);
+}
+
 function getRangeRandom(min, max) {
     return min + Math.random() * (max - min);
 }
 
 function addFallingSnow() {
 
-    let NUM_STORMS = 5;
+    let NUM_STORMS = 3;
 
     for (let i = 0; i < NUM_STORMS; i++) {
         let snowVertices = [];
@@ -364,7 +445,7 @@ function addGround() {
     {
         /**
          *  terrain.data[i] * NUMBER;
-         *  MODIFY THE HEIGHT OBTAINED FROM THE IMAGE BASED ON THE HEIGHT WE HAVE
+         *  modify the terrain z height as needed
          */
         terrain_geometry.vertices[i].z += terrain.data[i] * TERRAIN_HEIGHT_MOD;
 
@@ -429,6 +510,9 @@ function render() {
     }
 
     upDateParticles();
+
+    wolfAnimMixer.update(clock_wolf.getDelta());
+    deerAnimMixer.update(clock_deer.getDelta());
 
     controls.updateCameraMotion();
 
