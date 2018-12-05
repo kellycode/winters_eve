@@ -47,8 +47,6 @@ SimpleMobileControls = function (camera, domElement) {
             #lf_control {
                 bottom: 20px;
                 left: 20px;
-                }
-            #lf_control img {
                 -webkit-transform: scaleX(-1);
                 transform: scaleX(-1);
                 }
