@@ -21,6 +21,9 @@ SimpleMobileControls = function (camera, domElement) {
             `
             .m_control {
                 position: fixed;
+                height: 64px;
+                width: 64px;
+                padding: 8px;
                 text-decoration:none;
                 -webkit-user-select: none;
                 -moz-user-select: none;
@@ -32,10 +35,10 @@ SimpleMobileControls = function (camera, domElement) {
                 border-color: #333333;
                 background-color: transparent;;
                 font-weight: bold;
-                }
-            .m_control img {
-                height: 72px;
-                width: 72px;
+                background-image: url('./assets/up_turn.png');
+                background-size: 78px 78px;
+                background-repeat:no-repeat;
+                background-position: center center;
                 }
             #rt_control {
                 bottom: 20px;
@@ -110,13 +113,11 @@ SimpleMobileControls = function (camera, domElement) {
         scope.left = domElement.createElement('div');
         scope.left.id = 'lf_control';
         scope.left.className = 'm_control';
-        scope.left.innerHTML = '<img src="./assets/up_turn.png" alt="up turn">';
         domElement.getElementsByTagName('body')[0].appendChild(scope.left);
 
         scope.right = domElement.createElement('div');
         scope.right.id = 'rt_control';
         scope.right.className = 'm_control';
-        scope.right.innerHTML = '<img src="./assets/up_turn.png" alt="up turn">';
         domElement.getElementsByTagName('body')[0].appendChild(scope.right);
 
         scope.left.addEventListener('touchstart', scope.onLeftMouseDown, false);
