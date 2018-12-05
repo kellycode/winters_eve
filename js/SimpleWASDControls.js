@@ -23,15 +23,19 @@ SimpleWASDControls = function (camera, domElement) {
     this.onKeyDown = function (event) {
         switch (event.keyCode) {
             case 87: /*W*/
+            case 38: /*up arrow*/
                 scope.camera_action.moveForward = true;
                 break;
             case 68: /*D*/
+            case 39: /*right arrow*/
                 scope.camera_action.turnRight = true;
                 break;
             case 65: /*A*/
+            case 37: /*left arrow*/
                 scope.camera_action.turnLeft = true;
                 break;
             case 83: /*S*/
+            case 40: /*down arrow*/
                 scope.camera_action.moveBack = true;
                 break;
             case 109: /*numpad -*/
@@ -52,15 +56,19 @@ SimpleWASDControls = function (camera, domElement) {
     this.onKeyUp = function (event) {
         switch (event.keyCode) {
             case 87: /*W*/
+            case 38: /*up arrow*/
                 scope.camera_action.moveForward = false;
                 break;
             case 68: /*D*/
+            case 39: /*right arrow*/
                 scope.camera_action.turnRight = false;
                 break;
             case 65: /*A*/
+            case 37: /*left arrow*/
                 scope.camera_action.turnLeft = false;
                 break;
             case 83: /*S*/
+            case 40: /*down arrow*/
                 scope.camera_action.moveBack = false;
                 break;
             case 109: /*numpad -*/

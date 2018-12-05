@@ -2,7 +2,7 @@
 
 if (!THREE) {
     var THREE = {};
-    alert('THREE is not loaded');
+    console.error('THREE is not loaded');
 }
 
 // CONSTANTS
@@ -21,6 +21,8 @@ var renderer;
 var raycaster = new THREE.Raycaster();
 var ground_mesh;
 var controls = new SimpleWASDControls(camera, document);
+// only loads if touch is available
+var m_controls = new SimpleMobileControls(camera, document);
 var particles;
 var snowMaterials = [];
 var loading = '';
@@ -36,6 +38,8 @@ var groundTextureMap;
 var snowFlakeImage;
 var treeTexture;
 var moonSprite;
+var moonTexture;
+var firTexture;
 
 // ANIMATIONS
 var wolfAnimMixer, deerAnimMixer;
@@ -70,7 +74,7 @@ function preloadTextures() {
 
     textureManager.onStart = function (item, loaded, total) {
         // this gets called after any item has been loaded
-        // 1
+        // update loading notification 1
         updateLoadingPercent();
     };
 
@@ -81,8 +85,7 @@ function preloadTextures() {
 
     textureManager.onProgress = function (item, loaded, total) {
         // this gets called after any item has been loaded
-        console.log(item)
-        // 2,3,4
+        // update loading notifications 2,3,4 & 5 for each image
         updateLoadingPercent();
     };
 
@@ -93,6 +96,8 @@ function preloadTextures() {
     groundTextureMap = textureLoader.load("assets/snow_ground.jpg");
     snowFlakeImage = textureLoader.load("assets/snowflake.png");
     treeTexture = textureLoader.load("assets/evergreen_s.jpg");
+    firTexture = textureLoader.load("assets/fir.jpg");
+    moonTexture = textureLoader.load("assets/moon_sd.png");
 }
 
 window.addEventListener('resize', function () {
@@ -106,6 +111,7 @@ function setUpRenderer() {
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x56579e);
+    // shadow map
     renderer.shadowMap.enabled = true;
     renderer.shadowCameraNear = 3;
     renderer.shadowCameraFar = camera.far;
@@ -114,13 +120,13 @@ function setUpRenderer() {
     renderer.shadowMapWidth = 1024;
     renderer.shadowMapHeight = 1024;
     renderer.shadowMapDebug = false;
-
+    // add it
     renderer.domElement.id = "render_canvas";
     document.body.appendChild(renderer.domElement);
 }
 
 function addMoon() {
-    var spriteMap = new THREE.TextureLoader().load("assets/moon_sd.png");
+    var spriteMap = moonTexture;
     var spriteMaterial = new THREE.SpriteMaterial({map: spriteMap, color: 0xffffff});
     moonSprite = new THREE.Sprite(spriteMaterial);
     moonSprite.position.copy(MOON_POS);
@@ -129,13 +135,14 @@ function addMoon() {
 }
 
 function addTrees() {
+    // get the list of ground vertices to plant a tree at random locations
     let vertices = ground_mesh.geometry.vertices;
-
+    // add however many trees
     for (let i = 0; i < 100; i++) {
         var randomVertex = vertices[Math.floor(Math.random() * vertices.length)];
         let tree = buildTree(treeTexture);
         tree.position.set(randomVertex.x, randomVertex.y, randomVertex.z);
-        // don't land camera in a tree
+        // don't plant tree on the camera
         if (camera.position.distanceTo(tree.position) < 500) {
             i--;
             continue;
@@ -150,7 +157,7 @@ function addTrees() {
 function addAnimals() {
     wolfAnimMixer = new THREE.AnimationMixer(scene);
     deerAnimMixer = new THREE.AnimationMixer(scene);
-    
+
     let vertices = ground_mesh.geometry.vertices;
     let highPoint = new THREE.Vector3(0, 0, 0);
 
@@ -163,39 +170,39 @@ function addAnimals() {
 
     // add the wolf
     var wolfLoader = function (geometry, materials) {
-        // 5
+        // update loading notification 5
         updateLoadingPercent();
         var material = materials[ 0 ];
         material.morphTargets = true;
         material.color.setHex(0x8b6e4f);
+        material.map = firTexture;
         let mesh = new THREE.Mesh(geometry, materials);
         // set on the hilltop
         mesh.position.copy(highPoint);
-        // TODO: move this to model
+        // TODO: move this to model - maybe
         let scale = 20;
         mesh.scale.set(scale, scale, scale);
-        mesh.rotation.y = THREE.Math.randFloat(-1,1);
+        mesh.rotation.y = THREE.Math.randFloat(-1, 1);
         mesh.castShadow = true;
         mesh.updateMatrix();
         mesh.geometry.computeVertexNormals();
         scene.add(mesh);
-        
+        // wolf manages it's own
         wolfAnimMixer.clipAction(mesh.geometry.animations[ 0 ], mesh)
-                .setDuration(2)
+                .setDuration(2) // seconds
                 .startAt(0)
                 .play();
-
     };
     jsonLoader.load('assets/models/wolf_sitting.js', wolfLoader);
 
     // add a few deer
     function createDeer(deerGeometry, materials) {
-        // 6
+        // update loading notification 6
         updateLoadingPercent();
         var material = materials[ 0 ];
         material.morphTargets = true;
         material.color.setHex(0x774f25);
-
+        // add however many deer
         for (var i = 0; i < 10; i++) {
             var mesh = new THREE.Mesh(deerGeometry, materials);
             var scale = 10;
@@ -218,12 +225,13 @@ function addAnimals() {
     jsonLoader.load("assets/models/deer.js", createDeer);
 }
 
+// utility random range
 function getRangeRandom(min, max) {
     return min + Math.random() * (max - min);
 }
 
 function addFallingSnow() {
-
+    // however many groups of 100k snow flakes
     let NUM_STORMS = 3;
 
     for (let i = 0; i < NUM_STORMS; i++) {
@@ -260,19 +268,19 @@ function init() {
 }
 
 function addLights() {
-    //  LOW EVENING LIGHT
+    //  low evening light
     ambientLight = new THREE.AmbientLight(0x222222);
     scene.add(ambientLight);
 
-    // SIMULATED MOONLIGHT
+    // simulated moonlight
     directionalLight = new THREE.DirectionalLight(0x455767, 1);
     directionalLight.position.copy(MOONLIGHT_POS);
     directionalLight.castShadow = true;
+    // shadows
     directionalLight.shadow.camera.left = -5000;
     directionalLight.shadow.camera.bottom = -5000;
     directionalLight.shadow.camera.right = 5000;
     directionalLight.shadow.camera.top = 5000;
-
     directionalLight.shadow.mapSize.width = 2048;  // default
     directionalLight.shadow.mapSize.height = 2048; // default
     directionalLight.shadow.camera.near = 0.5;    // default
@@ -280,33 +288,23 @@ function addLights() {
 
     scene.add(directionalLight);
 
-    //Create a helper for the shadow camera (optional)
+    //Maybe need to see a helper for the shadow camera (optional)
     //var helper = new THREE.CameraHelper(directionalLight.shadow.camera);
     //scene.add(helper);
 }
 
-/**
- * 
- * Camera starts in the center of world and the position is modified later based
- * on terrain height when the terrain is built
- * 
- */
+
+ // Camera starts in the center of world and the position height is modified
+ // later based on terrain height when the terrain at that point
 function setupCamera() {
     camera.position.setX(0);
     camera.position.setY(0);
     camera.position.setZ(0);
-
+    // a better view
     camera.rotation.set(0, Math.PI / 2, 0);
 }
 
-/**
- * 
- * @returns {Array|getTerrainPixelData.normPixels}
- * Draw the image onto a canvas to get the pixel data (r,g,b,a)
- * 
- * TODO: THIS USES A PRELOADED IMAGE FROM AN IMG ELEMENT IN THE HTML, I DON'T THINK THIS IS NECESSARY
- * 
- */
+
 function getTerrainPixelData()
 {
     let img = document.getElementById("heightmap_image");
@@ -322,10 +320,7 @@ function getTerrainPixelData()
 
     canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
 
-
-
     /**
-     * 
      * The readonly ImageData.data property returns a Uint8ClampedArray representing
      * a one-dimensional array containing the data in the RGBA order, with integer
      * values between 0 and 255 (included).
@@ -336,7 +331,6 @@ function getTerrainPixelData()
      * with: rgba(red, green, blue, alpha). The alpha parameter is a number between
      * 0.0 (fully transparent) and 1.0 (fully opaque).
      * * https://www.w3schools.com/css/css3_colors.asp
-     *
      */
 
     let imgData = canvas.getContext('2d').getImageData(0, 0, img.height, img.width);
@@ -354,7 +348,6 @@ function getTerrainPixelData()
          * monochrome color image map we're getting our height by averaging the
          * three rgb color values.  They should all be the same value anyway but
          * averaging would allow using images that may not be monochrome
-         * 
          */
         normPixels.push((data[i] + data[i + 1] + data[i + 2]) / AVERAGE_NUM);
     }
@@ -369,13 +362,11 @@ function getTerrainPixelData()
 
 function addGround() {
 
-    // SKYBOX LOADING
-    // image directions
-    // px nx py ny pz nz
-    // rt lf up dn bk ft
+    // load and add the skybox
     let envMap = new THREE.CubeTextureLoader()
             .setPath('assets/skyboxes/forest/')
             .load(['posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg']);
+    
     scene.background = envMap;
 
     // GROUND TEXTURE
@@ -397,12 +388,8 @@ function addGround() {
 
     // START GROUND BUILDING
     /**
-     * 
-     * @type getTerrainPixelData.normPixels|Array
-     * 
      * Get ground pixel data for building ground model using an array containing
      * the "height" values of ALL of the image pixels
-     * 
      */
     let terrain = getTerrainPixelData();
 
@@ -410,16 +397,12 @@ function addGround() {
     const TEXTURE_SEGMENTS = terrain.segs;
 
     /**
-     * 
-     * @type Number|THREE.PlaneGeometry.vertices.z
-     * 
-     * SAFE_CAM_HEIGHT IS FOR SAVING THE HIGHEST Z VERTEX IN THE GROUND MODEL WITH PLAYER
-     * (CAMERA) HEIGHT TO IT SO AT LOAD THE CAMERA IS 100 UNITS ABOVE THE GROUND BELOW IT
+     * SAFE_CAM_HEIGHT is for saving the highest z vertex in the ground model with player
+     * (camera) height to it so at load the camera is 100 units above the ground below it
      */
     let SAFE_CAM_HEIGHT = 0;
 
     /**
-     * 
      * PlaneGeometry(width : Float, height : Float, widthSegments : Integer, heightSegments : Integer)
      * width — Width along the X axis. Default is 1.
      * height — Height along the Y axis. Default is 1.
@@ -515,6 +498,9 @@ function render() {
     deerAnimMixer.update(clock_deer.getDelta());
 
     controls.updateCameraMotion();
+    // touch controls
+    if (m_controls.touch_present)
+        m_controls.updateMobileCameraMotion();
 
     requestAnimationFrame(render);
 
