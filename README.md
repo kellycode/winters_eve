@@ -1,10 +1,14 @@
-A snowy winter scene built with three.js.  Quite lovely actually. :)
+Relaxing at home on a cold November day and looking out at dull houses and streets, I wanted to see this.
+A snowy winter scene built while learning three.js
 
 ![a snowy eve](https://kellycode.github.io/winters_eve/screen_shot.png)
 
-Relaxing at home on a cold November day.  Looking out my window was just dull houses and streets and I wanted to see this.
+- Custom Mobile and W,A,S,D,Arrow controls
 - Heightmap generated ground
 - Random placement of trees
+- Random placement of animated deer
+- Animated Wolf
 - Trees built from primitives objects
 - Skybox
-- 40k Snowflakes
+- Monn Sprite
+- 300k Snow Flakes
