@@ -47,16 +47,18 @@ var clock_deer = new THREE.Clock();
 var clock_wolf = new THREE.Clock();
 var jsonLoader = new THREE.JSONLoader( );
 var mesh;
+var snowStorms = [];
 
 function loadScene() {
     setUpRenderer();
     setupCamera();
     addLights();
     addGround();
-    addTrees();
     addAnimals();
     addFallingSnow();
     addMoon();
+    addSnowman();
+    addTrees();
     render();
 }
 
@@ -143,7 +145,7 @@ function addTrees() {
         let tree = buildTree(treeTexture);
         tree.position.set(randomVertex.x, randomVertex.y, randomVertex.z);
         // don't plant tree on the camera
-        if (camera.position.distanceTo(tree.position) < 500) {
+        if (camera.position.distanceTo(tree.position) < 1000) {
             i--;
             continue;
         }
@@ -232,7 +234,7 @@ function getRangeRandom(min, max) {
 
 function addFallingSnow() {
     // however many groups of 100k snow flakes
-    let NUM_STORMS = 3;
+    let NUM_STORMS = 2;
 
     for (let i = 0; i < NUM_STORMS; i++) {
         let snowVertices = [];
@@ -258,6 +260,8 @@ function addFallingSnow() {
         particles.position.z = -GROUND_SIZE / 2;
 
         particles.userData.speed = getRangeRandom(1, 2);
+
+        snowStorms.push(particles)
 
         scene.add(particles);
     }
@@ -294,8 +298,8 @@ function addLights() {
 }
 
 
- // Camera starts in the center of world and the position height is modified
- // later based on terrain height when the terrain at that point
+// Camera starts in the center of world and the position height is modified
+// later based on terrain height when the terrain at that point
 function setupCamera() {
     camera.position.setX(0);
     camera.position.setY(0);
@@ -366,7 +370,7 @@ function addGround() {
     let envMap = new THREE.CubeTextureLoader()
             .setPath('assets/skyboxes/forest/')
             .load(['posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg']);
-    
+
     scene.background = envMap;
 
     // GROUND TEXTURE
@@ -463,10 +467,36 @@ function addGround() {
     // END GROUND BUILDING
 }
 
+function addSnowman() {
+    var loader = new THREE.GLTFLoader().setPath('assets/models/');
+
+    var grabSnowman = function (gltf) {
+        gltf.scene.scale.y = gltf.scene.scale.x = gltf.scene.scale.z = 120;
+        gltf.scene.position.setX(4161);
+        gltf.scene.position.setY(35);
+        gltf.scene.position.setZ(3);
+
+        gltf.scene.children.forEach(function (item, index) {
+            item.geometry.computeFaceNormals();
+            item.geometry.computeVertexNormals();
+            item.receiveShadow = true;
+            item.castShadow = true;
+        });
+        
+        scene.add(gltf.scene);
+    };
+
+    var snowmanLoadFail = function (e) {
+        console.error(e);
+    };
+
+    loader.load('snowman.glb', grabSnowman, undefined, snowmanLoadFail);
+}
+
 function upDateParticles() {
 
-    for (var i = 0; i < scene.children.length; i++) {
-        var object = scene.children[ i ];
+    for (var i = 0; i < snowStorms.length; i++) {
+        var object = snowStorms[ i ];
         if (object instanceof THREE.Points) {
             object.position.y -= object.userData.speed;
             if (object.position.y < -(SKY_HEIGHT - 1000)) {
