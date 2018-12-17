@@ -29,38 +29,38 @@ class TreeFactory {
             treeMaterial // green
         ];
 
-        // radiusTop, radiusBottom, height, radialSegments
+        // radiusTop, radiusBottom, height, radialSegments, openEnded
         let c0 = new THREE.Mesh(new THREE.CylinderGeometry(2, 2, 12, 6, 1, true));
         c0.position.y = 6;
 
         let c1g = new THREE.CylinderGeometry(0, 14, 10, 10, 2, true);
         
         let c1 = new THREE.Mesh(c1g);
-        c1.position.y = 10;
+        c1.position.y = 6;
         c1.rotation.y = Math.random() * Math.PI;
 
         let c2 = new THREE.Mesh(new THREE.CylinderGeometry(0, 12, 10, 11, 2, true));
-        c2.position.y = 13;
+        c2.position.y = 9;
         c2.rotation.y = Math.random() * Math.PI;
 
         let c3 = new THREE.Mesh(new THREE.CylinderGeometry(0, 10, 10, 10, 2, true));
-        c3.position.y = 16;
+        c3.position.y = 12;
         c3.rotation.y = Math.random() * Math.PI;
 
         let c4 = new THREE.Mesh(new THREE.CylinderGeometry(0, 9, 8, 11, 2, true));
-        c4.position.y = 17.5;
+        c4.position.y = 15;
         c4.rotation.y = Math.random() * Math.PI;
 
         let c5 = new THREE.Mesh(new THREE.CylinderGeometry(0, 8, 8, 10, 2, true));
-        c5.position.y = 20;
+        c5.position.y = 18;
         c5.rotation.y = Math.random() * Math.PI;
 
         let c6 = new THREE.Mesh(new THREE.CylinderGeometry(0, 7, 8, 10, 2, true));
-        c6.position.y = 22.5;
+        c6.position.y = 21;
         c6.rotation.y = Math.random() * Math.PI;
 
         let c7 = new THREE.Mesh(new THREE.CylinderGeometry(0, 5, 9, 10, 2, true));
-        c7.position.y = 26;
+        c7.position.y = 24;
         c7.rotation.y = Math.random() * Math.PI;
 
         let g = new THREE.Geometry();
