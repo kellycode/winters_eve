@@ -3,6 +3,7 @@ A snowy winter scene built while learning three.js
 
 ![a snowy eve](https://kellycode.github.io/winters_eve/screen_shot.png)
 
+- Rigged and Animated a Snowman character as "player" and added a chase camera
 - Custom Mobile and W,A,S,D,Arrow controls
 - Heightmap generated ground
 - Random placement of trees
