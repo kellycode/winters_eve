@@ -22,9 +22,9 @@ if (!THREE) {
     let renderer;
     let raycaster = new THREE.Raycaster();
     let ground_mesh;
-    let controls;
+    let controls = new SimpleWASDControls(camera, document);
     // only loads if touch is available
-    let m_controls;
+    let m_controls = new SimpleMobileControls(camera, document);
     let snowMaterials = [];
     let loading = '';
     let stats = new Stats();
@@ -47,23 +47,24 @@ if (!THREE) {
     let ANIMATOR = {};
 
     // ANIMATIONS
-    let wolfAnimMixer, deerAnimMixer, playerAnimMixer;
+    let wolfAnimMixer, deerAnimMixer, snowmanAnimMixer;
     let clock_deer = new THREE.Clock();
     let clock_wolf = new THREE.Clock();
-    let clock_player = new THREE.Clock();
+    let clock_snowman = new THREE.Clock();
     let jsonLoader = new THREE.LegacyJSONLoader( );
     let snowStorms = [];
-    let player;
-    let playerLookAt;
+    let snowman;
 
     function loadScene() {
         setUpRenderer();
+        setupCamera();
         addLights();
         addGround();
         addAnimals();
         addFallingSnow();
         addMoon();
         addSnowman();
+        addTrees();
         render();
     }
 
@@ -150,7 +151,7 @@ if (!THREE) {
             let randomVertex = vertices[Math.floor(Math.random() * vertices.length)];
             let tree = TF.simpleTree(treeTexture);
             tree.position.set(randomVertex.x, randomVertex.y, randomVertex.z);
-            // don't land player in a tree
+            // don't plant tree on the camera
             if (camera.position.distanceTo(tree.position) < 1000) {
                 i--;
                 continue;
@@ -306,6 +307,17 @@ if (!THREE) {
     }
 
 
+    // Camera starts in the center of world and the position height is modified
+    // later based on terrain height when the terrain at that point
+    function setupCamera() {
+        camera.position.setX(0);
+        camera.position.setY(0);
+        camera.position.setZ(0);
+        // a better view
+        camera.rotation.set(0, Math.PI / 2, 0);
+    }
+
+
     function getTerrainPixelData()
     {
         let img = document.getElementById("heightmap_image");
@@ -398,6 +410,12 @@ if (!THREE) {
         const TEXTURE_SEGMENTS = terrain.segs;
 
         /**
+         * SAFE_CAM_HEIGHT is for saving the highest z vertex in the ground model with player
+         * (camera) height to it so at load the camera is 100 units above the ground below it
+         */
+        let SAFE_CAM_HEIGHT = 0;
+
+        /**
          * PlaneGeometry(width : Float, height : Float, widthSegments : Integer, heightSegments : Integer)
          * width — Width along the X axis. Default is 1.
          * height — Height along the Y axis. Default is 1.
@@ -419,7 +437,6 @@ if (!THREE) {
             console.log("............length: " + terrain.data.length + ", vertices length: " + terrain_geometry.vertices.length);
         }
 
-        // modify terrain by whatever
         for (let i = 0; i < terrain_geometry.vertices.length; i++)
         {
             /**
@@ -427,7 +444,19 @@ if (!THREE) {
              *  modify the terrain z height as needed
              */
             terrain_geometry.vertices[i].z += terrain.data[i] * TERRAIN_HEIGHT_MOD;
+
+            /**
+             * Save the camera height based on the highest point on the ground ground_mesh
+             * because, whatever the ground turns out to be, we want the camera to be
+             * above the ground
+             */
+            if (terrain_geometry.vertices[i].z > SAFE_CAM_HEIGHT) {
+                SAFE_CAM_HEIGHT = terrain_geometry.vertices[i].z + CAMERA_HEIGHT;
+            }
         }
+
+        // set camera to a safe height
+        camera.position.setY(SAFE_CAM_HEIGHT);
 
         // so shadows and light know what to do
         terrain_geometry.computeFaceNormals();
@@ -448,41 +477,29 @@ if (!THREE) {
     }
 
     function fadeToAction(name, duration) {
-
         ANIMATOR.previousAction = ANIMATOR.activeAction;
         ANIMATOR.activeAction = ANIMATOR.actions[ name ];
-
         if (ANIMATOR.previousAction !== ANIMATOR.activeAction) {
-
             ANIMATOR.previousAction.fadeOut(duration);
-
         }
-
         ANIMATOR.activeAction
                 .reset()
                 .setEffectiveTimeScale(1)
                 .setEffectiveWeight(1)
                 .fadeIn(duration)
                 .play();
-
     }
 
-    function createAnimator(model, animations) {
-
+    function createANIMATOR(model, animations) {
         ANIMATOR.mixer = new THREE.AnimationMixer(model);
-
         ANIMATOR.actions = {};
-
         for (var i = 0; i < animations.length; i++) {
-
             var clip = animations[ i ];
             var action = ANIMATOR.mixer.clipAction(clip);
             ANIMATOR.actions[ clip.name ] = action;
         }
-
         ANIMATOR.activeAction = ANIMATOR.actions['Idle'];
         ANIMATOR.activeAction.play();
-
     }
 
     function addSnowman() {
@@ -490,32 +507,27 @@ if (!THREE) {
 
         let grabSnowman = function (gltf) {
             gltf.scene.scale.y = gltf.scene.scale.x = gltf.scene.scale.z = 120;
-            gltf.scene.position.setX(0);//4161
-            gltf.scene.position.setY(1000);//35
-            gltf.scene.position.setZ(0);//3
-            gltf.scene.rotation.y -= Math.PI / 2;
+            gltf.scene.position.setX(-658);//4161
+            gltf.scene.position.setY(192);//35
+            gltf.scene.position.setZ(15);//3
+            //gltf.scene.rotation.y -= Math.PI / 2;
 
-            player = gltf.scene;
+            snowman = gltf.scene;
+            snowman.userData.isWalking = false;
 
-            controls = new SimpleWASDControls(player, document);
-            m_controls = new SimpleMobileControls(player, document);
+            createANIMATOR(snowman, gltf.animations);
 
-            createAnimator(player, gltf.animations);
-
-            scene.add(player);
-            
-            addTrees();
+            scene.add(gltf.scene);
         };
 
-        let playerLoadFail = function (e) {
+        let snowmanLoadFail = function (e) {
             console.error(e);
         };
 
-        loader.load('snowman.glb', grabSnowman, undefined, playerLoadFail);
+        loader.load('snowman1.glb', grabSnowman, undefined, snowmanLoadFail);
     }
 
     function upDateParticles() {
-
         for (let i = 0; i < snowStorms.length; i++) {
             var arr = snowStorms[i].geometry.attributes.position.array;
             for (let j = 0; j < arr.length; j += 3) {
@@ -526,10 +538,56 @@ if (!THREE) {
             }
             snowStorms[i].geometry.attributes.position.needsUpdate = true;
         }
+    }
 
+    function updateSnowman() {
+        if (snowman) {
+            // get the ground y, 1000 is fairly arbitrary
+            var castFrom = new THREE.Vector3(snowman.position.x, snowman.position.y + 1000, snowman.position.z);
+            raycaster.set(castFrom, DOWN_VECTOR);
+            let intersects = raycaster.intersectObject(ground_mesh);
+            if (intersects.length > 0) {
+                // set the snowman at ground level
+                snowman.position.setY(intersects[0].point.y);
+            }
+
+            // snowman always looks at the camera (player)
+            snowman.lookAt(camera.position.x, camera.position.y - 100, camera.position.z);
+
+            // should snowman be moving towards player
+            if (snowman.position.distanceTo(camera.position) > 500) {
+                var snowman_speed = 2;
+                snowman.translateZ( snowman_speed );
+                
+                // if the snowman isn't walking animation atm, he should be
+                if(!snowman.userData.isWalking) {
+                    fadeToAction('Walk', 0.5);
+                    snowman.userData.isWalking = true;
+                }
+            } else {
+                // if the snowman is walking animation atm, he shouldn't be
+                if(snowman.userData.isWalking) {
+                    fadeToAction('Idle', 0.5);
+                    snowman.userData.isWalking = false;
+                }
+            }
+        }
     }
 
     function render() {
+        // simple gravity
+        // use raycaster to keep camera on the ground
+        // casts down to see how far the ground and keeps
+        // camera at CAMERA_HEIGHT units above it
+        raycaster.set(camera.position, DOWN_VECTOR);
+        let intersects = raycaster.intersectObject(ground_mesh);
+
+        // if camera is above the ground
+        if (intersects.length > 0) {
+            let camOffset = CAMERA_HEIGHT - intersects[0].distance;
+            camera.position.setY(camera.position.y + camOffset);
+        }
+
         stats.update();
 
         upDateParticles();
@@ -538,58 +596,26 @@ if (!THREE) {
             wolfAnimMixer.update(clock_wolf.getDelta());
         if (deerAnimMixer)
             deerAnimMixer.update(clock_deer.getDelta());
-        if (playerAnimMixer)
-            playerAnimMixer.update(clock_player.getDelta());
+        if (snowmanAnimMixer)
+            snowmanAnimMixer.update(clock_snowman.getDelta());
 
-        var dt = clock_player.getDelta();
+        var dt = clock_snowman.getDelta();
 
         if (ANIMATOR.mixer)
             ANIMATOR.mixer.update(dt);
 
-        if (controls && player && camera)
-        {
-            // simple gravity
-            // use raycaster to keep player on the ground
-            raycaster.set(player.position, DOWN_VECTOR);
-            let intersects = raycaster.intersectObject(ground_mesh);
+        controls.updateCameraMotion();
 
-            // if camera is above the ground
-            if (intersects.length > 0) {
-                let camOffset = -intersects[0].distance + 10;
-                player.position.setY(player.position.y + camOffset);
-            }
+        updateSnowman();
 
-            // update position based on current controls
-            controls.updateCameraMotion(player);
-
-            // watch for action changes
-            let actionChange = controls.isPlayerActionChanged();
-            if (actionChange) {
-                fadeToAction(actionChange, 0.5);
-            }
-
-            // offset the chase camera
-            var cameraOffset = new THREE.Vector3(0, 1, 2.5);
-            var new_cam_position = cameraOffset.applyMatrix4(player.matrix);
-            camera.position.copy(new_cam_position);
-
-            // look above player not directly
-            var cameraLookAt = new THREE.Vector3(player.position.x, player.position.y + 150, player.position.z);
-            camera.lookAt(cameraLookAt);
-        }
-
-        // touch controlsa
-        if (m_controls && m_controls.touch_present) {
+        // touch controls
+        if (m_controls.touch_present)
             m_controls.updateMobileCameraMotion();
-        }
-            
-       requestAnimationFrame(render);
 
-        if (camera && player) {
-             renderer.render(scene, camera);
-        }   
+        requestAnimationFrame(render);
+
+        renderer.render(scene, camera);
     }
 
     init();
-    
 })();
