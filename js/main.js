@@ -17,6 +17,9 @@ if (!THREE) {
     const MOON_POS = new THREE.Vector3(-GROUND_SIZE * 2, GROUND_SIZE * 2 / 2, 0);
     const MOONLIGHT_POS = new THREE.Vector3(-GROUND_SIZE, GROUND_SIZE / 2, 0);
     const SHOW_STATS = false;
+    const AMB_LIGHT_COLOR = 0x222222;
+    const DIR_LIGHT_COLOR =0x455767;
+    const DEER_COUNT = 10;
 
     let scene = new THREE.Scene();
     let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, GROUND_SIZE * 5);
@@ -29,6 +32,7 @@ if (!THREE) {
     let snowMaterials = [];
     let loading = '';
     let stats;
+    
     if (SHOW_STATS) {
         stats = new Stats();
         document.body.appendChild(stats.dom);
@@ -48,10 +52,8 @@ if (!THREE) {
     let moonTexture;
     let firTexture;
 
-    let ANIMATOR = {};
-
-    // ANIMATIONS
-    let wolfAnimMixer, deerAnimMixer, snowmanAnimMixer;
+    // ANIMATION ITEMS
+    let wolfAnimMixer, deerAnimMixer;
     let clock_deer = new THREE.Clock();
     let clock_wolf = new THREE.Clock();
     let clock_snowman = new THREE.Clock();
@@ -63,6 +65,7 @@ if (!THREE) {
         setUpRenderer();
         setupCamera();
         addLights();
+        addSky();
         addGround();
         addAnimals();
         addFallingSnow();
@@ -83,28 +86,24 @@ if (!THREE) {
     }
 
     function preloadTextures() {
-
         textureManager.onStart = function (item, loaded, total) {
             // this gets called after any item has been loaded
-            // update loading notification 1
             updateLoadingPercent();
         };
-
         textureManager.onLoad = function (a, b, c) {
-            // all textures are loaded
+            // called when all textures are loaded
             loadScene();
         };
-
         textureManager.onProgress = function (item, loaded, total) {
             // this gets called after any item has been loaded
             // update loading notifications 2,3,4 & 5 for each image
             updateLoadingPercent();
         };
-
         textureManager.onError = function (url) {
             console.error('Failed to load texture ' + url);
         };
-
+        // textureLoader is a synchronous loader so we can throw it all the 
+        // texture requests at once without blocking
         groundTextureMap = textureLoader.load("assets/snow_ground.jpg");
         snowFlakeImage = textureLoader.load("assets/snowflake.png");
         treeTexture = textureLoader.load("assets/sb.png");
@@ -181,6 +180,9 @@ if (!THREE) {
             }
         }
 
+        // I need to make the deprecated json models
+        // go away but they're what I have atm
+        
         // add the wolf
         let wolfLoader = function (geometry, materials) {
             // update loading notification 5
@@ -210,13 +212,12 @@ if (!THREE) {
 
         // add a few deer
         function createDeer(deerGeometry, materials) {
-            // update loading notification 6
             updateLoadingPercent();
             let material = materials[ 0 ];
             material.morphTargets = true;
             material.color.setHex(0x774f25);
             // add however many deer
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < DEER_COUNT; i++) {
                 let mesh = new THREE.Mesh(deerGeometry, materials);
                 let scale = 10;
                 mesh.scale.set(scale, scale, scale);
@@ -233,7 +234,6 @@ if (!THREE) {
                         .startAt(0)	// random phase (already running)
                         .play();
             }
-
         }
         jsonLoader.load("assets/models/deer.js", createDeer);
     }
@@ -286,13 +286,14 @@ if (!THREE) {
 
     function addLights() {
         //  low evening light
-        ambientLight = new THREE.AmbientLight(0x222222);
+        ambientLight = new THREE.AmbientLight(AMB_LIGHT_COLOR);
         scene.add(ambientLight);
 
         // simulated moonlight
-        directionalLight = new THREE.DirectionalLight(0x455767, 1);
+        directionalLight = new THREE.DirectionalLight(DIR_LIGHT_COLOR, 1);
         directionalLight.position.copy(MOONLIGHT_POS);
         directionalLight.castShadow = true;
+        
         // shadows
         directionalLight.shadow.camera.left = -5000;
         directionalLight.shadow.camera.bottom = -5000;
@@ -304,10 +305,6 @@ if (!THREE) {
         directionalLight.shadow.camera.far = GROUND_SIZE * 2;     // default
 
         scene.add(directionalLight);
-
-        //Maybe need to see a helper for the shadow camera (optional)
-        //let helper = new THREE.CameraHelper(directionalLight.shadow.camera);
-        //scene.add(helper);
     }
 
 
@@ -321,79 +318,24 @@ if (!THREE) {
         camera.rotation.set(0, Math.PI / 2, 0);
     }
 
-
-    function getTerrainPixelData()
-    {
-        let img = document.getElementById("heightmap_image");
-        let canvas = document.getElementById("heightmap_canvas");
-
-        canvas.width = img.width;
-        canvas.height = img.height;
-
-        if (img.width !== img.height) {
-            alert('Terrain hightmap requires equal width and heights!\nCurrent width x height is ' + img.width + " x " + img.height);
-            console.error('Terrain hightmap requires equal width and heights!\nCurrent width x height is ' + img.width + " x " + img.height);
-        }
-
-        canvas.getContext('2d').drawImage(img, 0, 0, img.width, img.height);
-
-        /**
-         * The readonly ImageData.data property returns a Uint8ClampedArray representing
-         * a one-dimensional array containing the data in the RGBA order, with integer
-         * values between 0 and 255 (included).
-         * * https://developer.mozilla.org/en-US/docs/Web/API/ImageData/data
-         * 
-         * RGBA color values are an extension of RGB color values with an alpha channel
-         * - which specifies the opacity for a color. An RGBA color value is specified
-         * with: rgba(red, green, blue, alpha). The alpha parameter is a number between
-         * 0.0 (fully transparent) and 1.0 (fully opaque).
-         * * https://www.w3schools.com/css/css3_colors.asp
-         */
-
-        let imgData = canvas.getContext('2d').getImageData(0, 0, img.height, img.width);
-        let data = imgData.data;
-        let normPixels = [];
-
-        for (let i = 0, n = data.length; i < n; i += 4) {
-
-            const AVERAGE_NUM = 3;
-
-            /**
-             * get the average value of the R, G, B values
-             *  
-             * Because a height describes our height values based on a grayscale /
-             * monochrome color image map we're getting our height by averaging the
-             * three rgb color values.  They should all be the same value anyway but
-             * averaging would allow using images that may not be monochrome
-             */
-            normPixels.push((data[i] + data[i + 1] + data[i + 2]) / AVERAGE_NUM);
-        }
-
-        let terrain = {
-            data: normPixels,
-            segs: img.width - 1
-        };
-
-        return terrain;
-    }
-
-    function addGround() {
-
+    function addSky() {
         // load and add the skybox
         let envMap = new THREE.CubeTextureLoader()
                 .setPath('assets/skyboxes/forest/')
                 .load(['posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg']);
 
         scene.background = envMap;
+    }
 
+    function addGround() {
         // GROUND TEXTURE
         const TEXTURE_REPEAT = 10;
-
+        // texture already preloaded
         groundTextureMap.wrapS = THREE.RepeatWrapping;
         groundTextureMap.wrapT = THREE.RepeatWrapping;
         groundTextureMap.repeat.set(TEXTURE_REPEAT, TEXTURE_REPEAT);
-
-        let material = new THREE.MeshStandardMaterial({
+        // set the material
+        let terrain_material = new THREE.MeshStandardMaterial({
             color: 0xccccff,
             roughness: 1.0,
             map: groundTextureMap,
@@ -403,23 +345,16 @@ if (!THREE) {
             fog: true
         });
 
-        // START GROUND BUILDING
-        /**
-         * Get ground pixel data for building ground model using an array containing
-         * the "height" values of ALL of the image pixels
-         */
-        let terrain = getTerrainPixelData();
 
-        // set to heightmap image width - 1
-        const TEXTURE_SEGMENTS = terrain.segs;
+         // Get ground pixel data for building ground model using an array containing
+         // the "height" values of ALL of the image pixels
+        let terrain = KCD_PixelData.getPixelData('heightmap_image', 'heightmap_canvas')
 
-        /**
-         * SAFE_CAM_HEIGHT is for saving the highest z vertex in the ground model with player
-         * (camera) height to it so at load the camera is 100 units above the ground below it
-         */
+         // SAFE_CAM_HEIGHT is for saving the highest z vertex in the ground model with player
+         // (camera) height to it so at load the camera is 100 units above the ground below it
         let SAFE_CAM_HEIGHT = 0;
 
-        /**
+        /*
          * PlaneGeometry(width : Float, height : Float, widthSegments : Integer, heightSegments : Integer)
          * width — Width along the X axis. Default is 1.
          * height — Height along the Y axis. Default is 1.
@@ -427,15 +362,14 @@ if (!THREE) {
          * heightSegments — Optional. Default is 1.
          * 
          * Our heightmap is a component of our structure and simply an array of data
-         * more than an image: Keep in mind that the ground_mesh always has +1 more vertices
+         * more than an image: Keep in mind that the ground_mesh geometry always has +1 more vertices
          * than segments. If there's 100 x 100 segments means 101 x 101 vertices, etc,.
          * This means that the texture image should always be +1 width and height to
-         * the segments.
-         * 
-         * @type THREE.PlaneGeometry
+         * the segments and that number is sent back with the pixel data
          */
-        let terrain_geometry = new THREE.PlaneGeometry(GROUND_SIZE, GROUND_SIZE, TEXTURE_SEGMENTS, TEXTURE_SEGMENTS);
+        let terrain_geometry = new THREE.PlaneGeometry(GROUND_SIZE, GROUND_SIZE, terrain.segments, terrain.segments);
 
+        // just a quick check but this should never happen since geometry segments are built based on the terrain.data
         if (terrain.data.length !== terrain_geometry.vertices.length) {
             console.error("Image pixel data and Geometry Vertices are NOT equal!");
             console.log("............length: " + terrain.data.length + ", vertices length: " + terrain_geometry.vertices.length);
@@ -443,17 +377,12 @@ if (!THREE) {
 
         for (let i = 0; i < terrain_geometry.vertices.length; i++)
         {
-            /**
-             *  terrain.data[i] * NUMBER;
-             *  modify the terrain z height as needed
-             */
+            // modify the terrain z height as needed
             terrain_geometry.vertices[i].z += terrain.data[i] * TERRAIN_HEIGHT_MOD;
 
-            /**
-             * Save the camera height based on the highest point on the ground ground_mesh
-             * because, whatever the ground turns out to be, we want the camera to be
-             * above the ground
-             */
+            // get the highest point on the ground so we know wherever we set the
+            // camera, it'll be above ground, yes, it's kind of lazy.
+            // Why Z rather than Y, cause the ground loads, bu default, sideways
             if (terrain_geometry.vertices[i].z > SAFE_CAM_HEIGHT) {
                 SAFE_CAM_HEIGHT = terrain_geometry.vertices[i].z + CAMERA_HEIGHT;
             }
@@ -467,43 +396,16 @@ if (!THREE) {
         terrain_geometry.computeVertexNormals();
 
         // actually create and add the ground
-        ground_mesh = new THREE.Mesh(terrain_geometry, material);
+        ground_mesh = new THREE.Mesh(terrain_geometry, terrain_material);
         ground_mesh.position.set(0, 0, 0);
 
-        //ground_mesh.rotation.set(-Math.PI / 2, 0, 0);
+        //now that the ground is ready, rotate it properly
         ground_mesh.geometry.rotateX(-Math.PI / 2);
 
+        // yes, we will have shadows
         ground_mesh.receiveShadow = true;
 
         scene.add(ground_mesh);
-
-        // END GROUND BUILDING
-    }
-
-    function fadeToAction(name, duration) {
-        ANIMATOR.previousAction = ANIMATOR.activeAction;
-        ANIMATOR.activeAction = ANIMATOR.actions[ name ];
-        if (ANIMATOR.previousAction !== ANIMATOR.activeAction) {
-            ANIMATOR.previousAction.fadeOut(duration);
-        }
-        ANIMATOR.activeAction
-                .reset()
-                .setEffectiveTimeScale(1)
-                .setEffectiveWeight(1)
-                .fadeIn(duration)
-                .play();
-    }
-
-    function createANIMATOR(model, animations) {
-        ANIMATOR.mixer = new THREE.AnimationMixer(model);
-        ANIMATOR.actions = {};
-        for (var i = 0; i < animations.length; i++) {
-            var clip = animations[ i ];
-            var action = ANIMATOR.mixer.clipAction(clip);
-            ANIMATOR.actions[ clip.name ] = action;
-        }
-        ANIMATOR.activeAction = ANIMATOR.actions['Idle'];
-        ANIMATOR.activeAction.play();
     }
 
     function addSnowman() {
@@ -511,15 +413,14 @@ if (!THREE) {
 
         let grabSnowman = function (gltf) {
             gltf.scene.scale.y = gltf.scene.scale.x = gltf.scene.scale.z = 120;
-            gltf.scene.position.setX(-658);//4161
-            gltf.scene.position.setY(192);//35
-            gltf.scene.position.setZ(15);//3
-            //gltf.scene.rotation.y -= Math.PI / 2;
+            gltf.scene.position.setX(-658);
+            gltf.scene.position.setY(192);
+            gltf.scene.position.setZ(15);
 
             snowman = gltf.scene;
             snowman.userData.isWalking = false;
 
-            createANIMATOR(snowman, gltf.animations);
+            snowman.userData.animator = new KCD_Animator(snowman, gltf.animations, 'Idle');
 
             scene.add(gltf.scene);
         };
@@ -565,17 +466,22 @@ if (!THREE) {
 
                 // if the snowman isn't walking animation atm, he should be
                 if (!snowman.userData.isWalking) {
-                    fadeToAction('Walk', 0.5);
+                    snowman.userData.animator.fadeToAction('Walk', 0.5);
                     snowman.userData.isWalking = true;
                 }
             }
             else {
                 // if the snowman is walking animation atm, he shouldn't be
                 if (snowman.userData.isWalking) {
-                    fadeToAction('Idle', 0.5);
+                    snowman.userData.animator.fadeToAction('Idle', 0.5);
                     snowman.userData.isWalking = false;
                 }
             }
+            var dt = clock_snowman.getDelta();
+
+            if (snowman.userData.animator.mixer)
+                snowman.userData.animator.mixer.update(dt);
+
         }
     }
 
@@ -603,13 +509,6 @@ if (!THREE) {
             wolfAnimMixer.update(clock_wolf.getDelta());
         if (deerAnimMixer)
             deerAnimMixer.update(clock_deer.getDelta());
-        if (snowmanAnimMixer)
-            snowmanAnimMixer.update(clock_snowman.getDelta());
-
-        var dt = clock_snowman.getDelta();
-
-        if (ANIMATOR.mixer)
-            ANIMATOR.mixer.update(dt);
 
         controls.updateCameraMotion();
 
