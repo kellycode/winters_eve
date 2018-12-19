@@ -18,8 +18,9 @@ if (!THREE) {
     const MOONLIGHT_POS = new THREE.Vector3(-GROUND_SIZE, GROUND_SIZE / 2, 0);
     const SHOW_STATS = false;
     const AMB_LIGHT_COLOR = 0x222222;
-    const DIR_LIGHT_COLOR =0x455767;
+    const DIR_LIGHT_COLOR = 0x455767;
     const DEER_COUNT = 10;
+    const SNOWFLAKES = 50000;
 
     let scene = new THREE.Scene();
     let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, GROUND_SIZE * 5);
@@ -32,7 +33,7 @@ if (!THREE) {
     let snowMaterials = [];
     let loading = '';
     let stats;
-    
+
     if (SHOW_STATS) {
         stats = new Stats();
         document.body.appendChild(stats.dom);
@@ -77,10 +78,10 @@ if (!THREE) {
 
     function updateLoadingPercent() {
         loading = document.getElementById("load_percent").innerHTML;
-        loading = parseInt(loading) + 16;
+        loading = parseInt(loading) + 14;
         document.getElementById("load_percent").innerHTML = loading;
-        if (loading === 100) {
-            let elem = document.querySelector("#loading_info");
+        if (loading > 100) {
+            let elem = document.querySelector(".standard_notice");
             elem.style.display = 'none';
         }
     }
@@ -182,7 +183,7 @@ if (!THREE) {
 
         // I need to make the deprecated json models
         // go away but they're what I have atm
-        
+
         // add the wolf
         let wolfLoader = function (geometry, materials) {
             // update loading notification 5
@@ -252,7 +253,7 @@ if (!THREE) {
             let snowVertices = [];
             let snowGeometry = new THREE.BufferGeometry();
 
-            for (let c = 0; c < 100000; c++) {
+            for (let c = 0; c < SNOWFLAKES; c++) {
                 let x = Math.random() * GROUND_SIZE;
                 let y = Math.random() * SKY_HEIGHT / 2;
                 let z = Math.random() * GROUND_SIZE;
@@ -293,7 +294,7 @@ if (!THREE) {
         directionalLight = new THREE.DirectionalLight(DIR_LIGHT_COLOR, 1);
         directionalLight.position.copy(MOONLIGHT_POS);
         directionalLight.castShadow = true;
-        
+
         // shadows
         directionalLight.shadow.camera.left = -5000;
         directionalLight.shadow.camera.bottom = -5000;
@@ -346,12 +347,12 @@ if (!THREE) {
         });
 
 
-         // Get ground pixel data for building ground model using an array containing
-         // the "height" values of ALL of the image pixels
+        // Get ground pixel data for building ground model using an array containing
+        // the "height" values of ALL of the image pixels
         let terrain = KCD_PixelData.getPixelData('heightmap_image', 'heightmap_canvas')
 
-         // SAFE_CAM_HEIGHT is for saving the highest z vertex in the ground model with player
-         // (camera) height to it so at load the camera is 100 units above the ground below it
+        // SAFE_CAM_HEIGHT is for saving the highest z vertex in the ground model with player
+        // (camera) height to it so at load the camera is 100 units above the ground below it
         let SAFE_CAM_HEIGHT = 0;
 
         /*
