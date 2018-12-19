@@ -16,6 +16,7 @@ if (!THREE) {
     const MOON_SCALE = 1000;
     const MOON_POS = new THREE.Vector3(-GROUND_SIZE * 2, GROUND_SIZE * 2 / 2, 0);
     const MOONLIGHT_POS = new THREE.Vector3(-GROUND_SIZE, GROUND_SIZE / 2, 0);
+    const SHOW_STATS = false;
 
     let scene = new THREE.Scene();
     let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, GROUND_SIZE * 5);
@@ -27,8 +28,11 @@ if (!THREE) {
     let m_controls = new SimpleMobileControls(camera, document);
     let snowMaterials = [];
     let loading = '';
-    let stats = new Stats();
-    document.body.appendChild(stats.dom);
+    let stats;
+    if (SHOW_STATS) {
+        stats = new Stats();
+        document.body.appendChild(stats.dom);
+    }
 
     // LIGHTS
     let directionalLight;
@@ -557,16 +561,17 @@ if (!THREE) {
             // should snowman be moving towards player
             if (snowman.position.distanceTo(camera.position) > 500) {
                 var snowman_speed = 2;
-                snowman.translateZ( snowman_speed );
-                
+                snowman.translateZ(snowman_speed);
+
                 // if the snowman isn't walking animation atm, he should be
-                if(!snowman.userData.isWalking) {
+                if (!snowman.userData.isWalking) {
                     fadeToAction('Walk', 0.5);
                     snowman.userData.isWalking = true;
                 }
-            } else {
+            }
+            else {
                 // if the snowman is walking animation atm, he shouldn't be
-                if(snowman.userData.isWalking) {
+                if (snowman.userData.isWalking) {
                     fadeToAction('Idle', 0.5);
                     snowman.userData.isWalking = false;
                 }
@@ -588,7 +593,9 @@ if (!THREE) {
             camera.position.setY(camera.position.y + camOffset);
         }
 
-        stats.update();
+        if (SHOW_STATS) {
+            stats.update();
+        }
 
         upDateParticles();
 
