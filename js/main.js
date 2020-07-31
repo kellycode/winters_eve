@@ -11,6 +11,7 @@ if (!THREE) {
     const TERRAIN_HEIGHT_MOD = 2;
     const CAMERA_HEIGHT = 100;
     const DOWN_VECTOR = new THREE.Vector3(0, -1, 0);
+    // no trees if less than 10000
     const GROUND_SIZE = 10000;
     const SKY_HEIGHT = 3000;
     const MOON_SCALE = 1000;
@@ -147,6 +148,11 @@ if (!THREE) {
     }
 
     function addTrees() {
+        if(GROUND_SIZE < 10000) {
+            console.log('GROUND_SIZE is too small to add trees');
+            return;
+        }
+        
         let TF = new TreeFactory();
         // get the list of ground vertices to plant a tree at random locations
         let vertices = ground_mesh.geometry.vertices;
