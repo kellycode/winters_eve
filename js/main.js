@@ -320,6 +320,9 @@ function WintersEve(THREE, Stats, GLTFLoader) {
         return min + Math.random() * (max - min);
     }
 
+    // atm the snow is over the whole scene all the time so the camera can walk
+    // into falling snow and looks like snow motion should look.  Seems like
+    // there should be a way to make it more efficient
     function addFallingSnow() {
         // however many groups of 100k snow flakes
         // atm only need 1
