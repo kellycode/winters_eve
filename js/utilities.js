@@ -1,47 +1,6 @@
 
 
-class KCD_Detect {
-    static isIE() {
-        var ua = window.navigator.userAgent;
-
-        // Test values; Uncomment to check result …
-
-        // IE 10
-        // ua = 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)';
-
-        // IE 11
-        // ua = 'Mozilla/5.0 (Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko';
-
-        // Edge 12 (Spartan)
-        // ua = 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.71 Safari/537.36 Edge/12.0';
-
-        // Edge 13
-        // ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2486.0 Safari/537.36 Edge/13.10586';
-
-        var msie = ua.indexOf('MSIE ');
-        if (msie > 0) {
-            // IE 10 or older => return version number
-            return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-        }
-
-        var trident = ua.indexOf('Trident/');
-        if (trident > 0) {
-            // IE 11 => return version number
-            var rv = ua.indexOf('rv:');
-            return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
-        }
-
-        var edge = ua.indexOf('Edge/');
-        if (edge > 0) {
-            // Edge (IE 12+) => return version number
-            return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
-        }
-
-        // other browser
-        return false;
-    }
-}
-
+// for grabbing the img and building the pixel data for the terrain
 class KCD_PixelData {
     static getPixelData(image_elem, canvas_elem) {
         let img = document.getElementById(image_elem);
@@ -49,6 +8,15 @@ class KCD_PixelData {
 
         canvas.width = img.width;
         canvas.height = img.height;
+        
+        /*
+         * so the image is loaded in the browser as a standard img tag and we get
+         * the pixel data out of it to make the height map.  It's been a while,
+         * but I think I messed around with a lot of different methods of loading
+         * image data and letting the browser do the heavy lifting gave me several
+         * advantages - smooth terrain in particular.  And, by using a canvas
+         * I get a lot of built in methods to modify the image if needed.
+         */
 
         if (img.width !== img.height) {
             alert('Terrain hightmap requires equal width and heights!\nCurrent width x height is ' + img.width + " x " + img.height);
@@ -98,9 +66,10 @@ class KCD_PixelData {
     }
 }
 
+// place for the working with animation fades
 class KCD_Animator {
 
-    constructor(model, animations, start_action) {
+    constructor(THREE, model, animations, start_action) {
         this.previousAction = start_action;
         this.activeAction = start_action;
 

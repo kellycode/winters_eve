@@ -1,3 +1,6 @@
+March 2022 - Updated for three revision 138
+(update nerfed the animated json models so looking for time to put the modeler/animator hat)
+
 Relaxing at home on a cold November day and looking out at dull houses and streets, I wanted to see this.
 A snowy winter scene built while re-learning three.js
 

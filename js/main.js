@@ -1,33 +1,55 @@
-// just for the IDE
-if (!THREE) {
-    var THREE = {};
-    console.error('THREE is not loaded');
-}
+/*
+ * 
+ * updated to THREE revision 138 March, 2022
+ * 
+ */
 
-(function WintersEve() {
+function WintersEve(THREE, Stats, GLTFLoader) {
     'use strict';
 
+    if (!THREE) {
+        var THREE = {};
+        console.error('THREE is not loaded for main.js');
+    }
+
     // CONSTANTS
+    // multiplier for the terrain height to exagerate or smooth
     const TERRAIN_HEIGHT_MOD = 2;
+    // kinda standard human height
     const CAMERA_HEIGHT = 100;
+    // raycaster direction
     const DOWN_VECTOR = new THREE.Vector3(0, -1, 0);
     // no trees if less than 10000
     const GROUND_SIZE = 10000;
+    // for the falling snow top
     const SKY_HEIGHT = 3000;
+    // moon things
     const MOON_SCALE = 1000;
     const MOON_POS = new THREE.Vector3(-GROUND_SIZE * 2, GROUND_SIZE * 2 / 2, 0);
     const MOONLIGHT_POS = new THREE.Vector3(-GROUND_SIZE, GROUND_SIZE / 2, 0);
+    // The three stats box thing
     const SHOW_STATS = false;
+    // light
     const AMB_LIGHT_COLOR = 0x222222;
     const DIR_LIGHT_COLOR = 0x455767;
+    // how many
     const DEER_COUNT = 10;
     const SNOWFLAKES = 50000;
+    const TREE_COUNT = 100;
+    const TREE_SINK = 100;
+    const TREE_SCALE = 20;
 
+    // GLOBAL-ish
+    let G_HIGHPOINT;
+
+    // world stuff
     let scene = new THREE.Scene();
     let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, GROUND_SIZE * 5);
     let renderer;
     let raycaster = new THREE.Raycaster();
     let ground_mesh;
+    // where the vertices are now stored as well
+    let terrain_geometry;
     let controls = new SimpleWASDControls(camera, document);
     // only loads if touch is available
     let m_controls = new SimpleMobileControls(camera, document);
@@ -55,11 +77,12 @@ if (!THREE) {
     let firTexture;
 
     // ANIMATION ITEMS
+    // doto: reanimate the wolf and deer gltf conversions or make new ones
     let wolfAnimMixer, deerAnimMixer;
     let clock_deer = new THREE.Clock();
     let clock_wolf = new THREE.Clock();
     let clock_snowman = new THREE.Clock();
-    let jsonLoader = new THREE.LegacyJSONLoader( );
+
     let snowStorms = [];
     let snowman;
 
@@ -77,11 +100,23 @@ if (!THREE) {
         render();
     }
 
+    /*
+     * this posts the 4 key loading bits
+     * 1. texture loading starts
+     * 2. texture loading ends
+     * 3. trees built n added
+     * 4. deer built n added
+     * we just add 25 (percent) after each is done and
+     * getting to 100 means we're done.  not doing any
+     * heavy error checking or cool stuff like that,
+     * just letting the user know that something's happening.
+     */
+
     function updateLoadingPercent() {
         loading = document.getElementById("load_percent").innerHTML;
-        loading = parseInt(loading) + 14;
+        loading = parseInt(loading) + 25;
         document.getElementById("load_percent").innerHTML = loading;
-        if (loading > 100) {
+        if (loading >= 100) {
             let elem = document.querySelector(".standard_notice");
             elem.style.display = 'none';
         }
@@ -94,12 +129,13 @@ if (!THREE) {
         };
         textureManager.onLoad = function (a, b, c) {
             // called when all textures are loaded
+            updateLoadingPercent();
             loadScene();
         };
         textureManager.onProgress = function (item, loaded, total) {
             // this gets called after any item has been loaded
             // update loading notifications 2,3,4 & 5 for each image
-            updateLoadingPercent();
+            // do nothing atm
         };
         textureManager.onError = function (url) {
             console.error('Failed to load texture ' + url);
@@ -148,101 +184,135 @@ if (!THREE) {
     }
 
     function addTrees() {
-        if(GROUND_SIZE < 10000) {
+        if (GROUND_SIZE < 10000) {
             console.log('GROUND_SIZE is too small to add trees');
             return;
         }
-        
-        let TF = new TreeFactory();
+
+        let TF = new TreeFactory(THREE);
+
         // get the list of ground vertices to plant a tree at random locations
-        let vertices = ground_mesh.geometry.vertices;
+        let vertices = terrain_geometry.userData.vertices;
+
+        // lower trees a bit to simulate snow depth
+        let snowDepth = TREE_SINK;
+
         // add however many trees
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < TREE_COUNT; i++) {
             let randomVertex = vertices[Math.floor(Math.random() * vertices.length)];
             let tree = TF.simpleTree(treeTexture);
-            tree.position.set(randomVertex.x, randomVertex.y, randomVertex.z);
+            tree.position.set(randomVertex.x, randomVertex.y - snowDepth, randomVertex.z);
+
             // don't plant tree on the camera
             if (camera.position.distanceTo(tree.position) < 1000) {
                 i--;
                 continue;
             }
-            tree.scale.y = tree.scale.x = tree.scale.z = 10;
+
+            // don't plant tree on the wolf
+            // wolf is at the highpoint
+            if (G_HIGHPOINT.distanceTo(tree.position) < 500) {
+                i--;
+                continue;
+            }
+
+            tree.scale.y = tree.scale.x = tree.scale.z = TREE_SCALE;
             tree.receiveShadow = true;
             tree.castShadow = true;
+
             scene.add(tree);
         }
+        updateLoadingPercent();
     }
 
     function addAnimals() {
         wolfAnimMixer = new THREE.AnimationMixer(scene);
         deerAnimMixer = new THREE.AnimationMixer(scene);
 
-        let vertices = ground_mesh.geometry.vertices;
-        let highPoint = new THREE.Vector3(0, 0, 0);
+        let vertices = terrain_geometry.userData.vertices;
+        G_HIGHPOINT = new THREE.Vector3(0, 0, 0);
 
-        // the highest y is the hill top for the wolf
+        // the highest z is the hill top for the wolf
         for (let i = 0; i < vertices.length; i++) {
-            if (vertices[i].y > highPoint.y) {
-                highPoint.copy(vertices[i]);
+            if (vertices[i].y > G_HIGHPOINT.y) {
+                G_HIGHPOINT.copy(vertices[i]);
             }
         }
 
-        // I need to make the deprecated json models
-        // go away but they're what I have atm
+        let loader = new GLTFLoader().setPath('assets/models/');
 
-        // add the wolf
-        let wolfLoader = function (geometry, materials) {
-            // update loading notification 5
-            updateLoadingPercent();
-            let material = materials[ 0 ];
-            material.morphTargets = true;
-            material.color.setHex(0x8b6e4f);
-            material.map = firTexture;
-            let mesh = new THREE.Mesh(geometry, materials);
-            // set on the hilltop
-            mesh.position.copy(highPoint);
-            // TODO: move this to model - maybe
-            let scale = 20;
-            mesh.scale.set(scale, scale, scale);
-            mesh.rotation.y = THREE.Math.randFloat(-1, 1);
-            mesh.castShadow = true;
-            mesh.updateMatrix();
-            mesh.geometry.computeVertexNormals();
-            scene.add(mesh);
-            // wolf manages it's own
-            wolfAnimMixer.clipAction(mesh.geometry.animations[ 0 ], mesh)
-                    .setDuration(2) // seconds
-                    .startAt(0)
-                    .play();
+        let addTheWolf = function (gltf) {
+            gltf.scene.scale.y = gltf.scene.scale.x = gltf.scene.scale.z = 15;
+            gltf.scene.position.copy(G_HIGHPOINT);
+
+            let wolfMaterial = gltf.scene.children[0].material;
+            wolfMaterial.morphTargets = true;
+            wolfMaterial.color.setHex(0x8b6e4f);
+            wolfMaterial.map = firTexture;
+
+            //update its matrix so the geometry shares the rotation
+            let wolfMesh = gltf.scene.children[0];
+            // wolf looks some random direction
+            wolfMesh.geometry.rotateZ(THREE.Math.randFloat(-Math.PI, Math.PI));
+            wolfMesh.castShadow = true;
+            wolfMesh.updateMatrix();
+            wolfMesh.geometry.computeVertexNormals();
+
+            scene.add(gltf.scene);
         };
-        jsonLoader.load('assets/models/wolf_sitting.js', wolfLoader);
+
+        let wolfLoadFail = function (e) {
+            console.log("Wolf load failed:");
+            console.error(e);
+        };
+
+        loader.load('wolf_sitting.glb', addTheWolf, undefined, wolfLoadFail);
+
 
         // add a few deer
-        function createDeer(deerGeometry, materials) {
-            updateLoadingPercent();
-            let material = materials[ 0 ];
-            material.morphTargets = true;
-            material.color.setHex(0x774f25);
+        function createDeer(deerGLTF) {
+
+            let deerMaterial = deerGLTF.scene.children[0].material;
+            let deerMesh = deerGLTF.scene.children[0];
+
+            deerMaterial.morphTargets = true;
+            deerMaterial.color.setHex(0x774f25);
+
             // add however many deer
             for (let i = 0; i < DEER_COUNT; i++) {
-                let mesh = new THREE.Mesh(deerGeometry, materials);
+
                 let scale = 10;
-                mesh.scale.set(scale, scale, scale);
+
+                deerMesh.scale.set(scale, scale, scale);
+
                 let randomVertex = vertices[Math.floor(Math.random() * vertices.length)];
-                mesh.position.set(randomVertex.x, randomVertex.y + 50, randomVertex.z);
-                mesh.rotation.set(0, Math.random() * Math.PI, 0);
-                mesh.castShadow = true;
-                mesh.receiveShadow = true;
-                mesh.geometry.dynamic = true;
-                mesh.geometry.computeVertexNormals();
-                scene.add(mesh);
-                deerAnimMixer.clipAction(deerGeometry.animations[ 0 ], mesh)
-                        .setDuration(10)			// one second
-                        .startAt(0)	// random phase (already running)
-                        .play();
+
+                // 37.5 is cheating, I know what the height is, should be checked
+                deerMesh.position.set(randomVertex.x, randomVertex.y + 37.5, randomVertex.z);
+                //deerMesh.rotation.set(0, Math.random() * Math.PI, 0);
+                deerMesh.castShadow = true;
+                deerMesh.receiveShadow = true;
+                //deerMesh.geometry.dynamic = true;
+                deerMesh.geometry.computeVertexNormals();
+
+                scene.add(deerGLTF.scene.clone());
+
+                // need to put on my modeler/animator height and make some new deer
+                // but no animal animations atm
+//                deerAnimMixer.clipAction(deerGeometry.animations[ 0 ], mesh)
+//                        .setDuration(10)			// one second
+//                        .startAt(0)	// random phase (already running)
+//                        .play();
             }
+            updateLoadingPercent();
         }
-        jsonLoader.load("assets/models/deer.js", createDeer);
+
+        let deerLoadFail = function (e) {
+            console.log("Deer load failed:");
+            console.error(e);
+        };
+
+        loader.load("deer.glb", createDeer, undefined, deerLoadFail);
     }
 
     // utility random range
@@ -266,7 +336,7 @@ if (!THREE) {
                 snowVertices.push(x, y, z);
             }
 
-            snowGeometry.addAttribute('position', new THREE.Float32BufferAttribute(snowVertices, 3));
+            snowGeometry.setAttribute('position', new THREE.Float32BufferAttribute(snowVertices, 3));
             // size of snowflake
             let size = getRangeRandom(15, 20);
 
@@ -335,13 +405,16 @@ if (!THREE) {
     }
 
     function addGround() {
+
         // GROUND TEXTURE
         const TEXTURE_REPEAT = 10;
+
         // texture already preloaded
         groundTextureMap.wrapS = THREE.RepeatWrapping;
         groundTextureMap.wrapT = THREE.RepeatWrapping;
         groundTextureMap.repeat.set(TEXTURE_REPEAT, TEXTURE_REPEAT);
-        // set the material
+
+        // set the snow material
         let terrain_material = new THREE.MeshStandardMaterial({
             color: 0xccccff,
             roughness: 1.0,
@@ -352,10 +425,12 @@ if (!THREE) {
             fog: true
         });
 
-
+        // Over in utilities.js
         // Get ground pixel data for building ground model using an array containing
-        // the "height" values of ALL of the image pixels
-        let terrain = KCD_PixelData.getPixelData('heightmap_image', 'heightmap_canvas')
+        // the "height" values of ALL of the image pixels.  The image is an actual
+        // img tag in the html with display none.  This means it's already loaded and
+        // we can use anything that works in an img tag
+        let terrain = KCD_PixelData.getPixelData('heightmap_image', 'heightmap_canvas');
 
         // SAFE_CAM_HEIGHT is for saving the highest z vertex in the ground model with player
         // (camera) height to it so at load the camera is 100 units above the ground below it
@@ -374,49 +449,60 @@ if (!THREE) {
          * This means that the texture image should always be +1 width and height to
          * the segments and that number is sent back with the pixel data
          */
-        let terrain_geometry = new THREE.PlaneGeometry(GROUND_SIZE, GROUND_SIZE, terrain.segments, terrain.segments);
-
-        // just a quick check but this should never happen since geometry segments are built based on the terrain.data
-        if (terrain.data.length !== terrain_geometry.vertices.length) {
-            console.error("Image pixel data and Geometry Vertices are NOT equal!");
-            console.log("............length: " + terrain.data.length + ", vertices length: " + terrain_geometry.vertices.length);
-        }
-
-        for (let i = 0; i < terrain_geometry.vertices.length; i++)
-        {
-            // modify the terrain z height as needed
-            terrain_geometry.vertices[i].z += terrain.data[i] * TERRAIN_HEIGHT_MOD;
-
-            // get the highest point on the ground so we know wherever we set the
-            // camera, it'll be above ground, yes, it's kind of lazy.
-            // Why Z rather than Y, cause the ground loads, bu default, sideways
-            if (terrain_geometry.vertices[i].z > SAFE_CAM_HEIGHT) {
-                SAFE_CAM_HEIGHT = terrain_geometry.vertices[i].z + CAMERA_HEIGHT;
-            }
-        }
-
-        // set camera to a safe height
-        camera.position.setY(SAFE_CAM_HEIGHT);
-
-        // so shadows and light know what to do
-        terrain_geometry.computeFaceNormals();
-        terrain_geometry.computeVertexNormals();
+        terrain_geometry = new THREE.PlaneGeometry(GROUND_SIZE, GROUND_SIZE, terrain.segments, terrain.segments);
+        terrain_geometry.userData.vertices = [];
 
         // actually create and add the ground
         ground_mesh = new THREE.Mesh(terrain_geometry, terrain_material);
         ground_mesh.position.set(0, 0, 0);
 
-        //now that the ground is ready, rotate it properly
+        //rotate it so up is Y
         ground_mesh.geometry.rotateX(-Math.PI / 2);
+
+        //update its matrix so the vertex positions reflect the rotation
+        ground_mesh.updateMatrix();
+        ground_mesh.geometry.applyMatrix4(ground_mesh.matrix);
+        ground_mesh.matrix.identity();
 
         // yes, we will have shadows
         ground_mesh.receiveShadow = true;
 
+        // here we apply the height information from the image to the PlaneGeometry.
+        // So modifying the Y position of all vertices to show ground height according
+        // to our map
+        const positionAttribute = terrain_geometry.getAttribute('position');
+
+        for (let i = 0; i < positionAttribute.count; i++) {
+            // temp vertex holder
+            const vertex = new THREE.Vector3();
+            // extract the vertex information
+            vertex.fromBufferAttribute(positionAttribute, i);
+            // add the image data and whatever mod we decised on
+            vertex.y += terrain.data[i] * TERRAIN_HEIGHT_MOD;
+            // and set that position
+            positionAttribute.setY(i, vertex.y);
+            // get a height to insure the camera starts above ground so our
+            // first ray caster down is sure to find something
+            if (vertex.y > SAFE_CAM_HEIGHT) {
+                SAFE_CAM_HEIGHT = vertex.y + CAMERA_HEIGHT;
+            }
+
+            // while we're here looping over the vertex data, get the vertex xyz
+            // positions and store them for easy use later when positioning objects
+            // on the ground
+            terrain_geometry.userData.vertices.push(vertex);
+        }
+
+
+        // set camera to the safe height to start
+        camera.position.setY(SAFE_CAM_HEIGHT);
+
+        // and add it
         scene.add(ground_mesh);
     }
 
     function addSnowman() {
-        let loader = new THREE.GLTFLoader().setPath('assets/models/');
+        let loader = new GLTFLoader().setPath('assets/models/');
 
         let grabSnowman = function (gltf) {
             gltf.scene.scale.y = gltf.scene.scale.x = gltf.scene.scale.z = 120;
@@ -425,9 +511,17 @@ if (!THREE) {
             gltf.scene.position.setZ(15);
 
             snowman = gltf.scene;
+            
+            // set up the animations
             snowman.userData.isWalking = false;
-
-            snowman.userData.animator = new KCD_Animator(snowman, gltf.animations, 'Idle');
+            snowman.userData.animator = new KCD_Animator(THREE, snowman, gltf.animations, 'Idle');
+            
+            // shadow makes it all real
+            gltf.scene.traverse(function (node) {
+                if (node.isMesh) {
+                    node.castShadow = true;
+                }
+            });
 
             scene.add(gltf.scene);
         };
@@ -436,7 +530,7 @@ if (!THREE) {
             console.error(e);
         };
 
-        loader.load('snowman1.glb', grabSnowman, undefined, snowmanLoadFail);
+        loader.load('snowman.glb', grabSnowman, undefined, snowmanLoadFail);
     }
 
     function upDateParticles() {
@@ -512,10 +606,14 @@ if (!THREE) {
 
         upDateParticles();
 
-        if (wolfAnimMixer)
-            wolfAnimMixer.update(clock_wolf.getDelta());
-        if (deerAnimMixer)
-            deerAnimMixer.update(clock_deer.getDelta());
+        // need to put on my modeler/animator height and make some new critters
+        // but no animal animations atm
+        /*
+         if (wolfAnimMixer)
+         wolfAnimMixer.update(clock_wolf.getDelta());
+         if (deerAnimMixer)
+         deerAnimMixer.update(clock_deer.getDelta());
+         */
 
         controls.updateCameraMotion();
 
@@ -531,4 +629,4 @@ if (!THREE) {
     }
 
     init();
-})();
+}
