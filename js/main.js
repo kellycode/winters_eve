@@ -1,15 +1,15 @@
 /*
- * 
+ *
  * updated to THREE revision 138 March, 2022
- * 
+ *
  */
 
 function WintersEve(THREE, Stats, GLTFLoader) {
-    'use strict';
+    "use strict";
 
     if (!THREE) {
         var THREE = {};
-        console.error('THREE is not loaded for main.js');
+        console.error("THREE is not loaded for main.js");
     }
 
     // CONSTANTS
@@ -25,7 +25,11 @@ function WintersEve(THREE, Stats, GLTFLoader) {
     const SKY_HEIGHT = 3000;
     // moon things
     const MOON_SCALE = 1000;
-    const MOON_POS = new THREE.Vector3(-GROUND_SIZE * 2, GROUND_SIZE * 2 / 2, 0);
+    const MOON_POS = new THREE.Vector3(
+        -GROUND_SIZE * 2,
+        (GROUND_SIZE * 2) / 2,
+        0
+    );
     const MOONLIGHT_POS = new THREE.Vector3(-GROUND_SIZE, GROUND_SIZE / 2, 0);
     // The three stats box thing
     const SHOW_STATS = false;
@@ -44,7 +48,12 @@ function WintersEve(THREE, Stats, GLTFLoader) {
 
     // world stuff
     let scene = new THREE.Scene();
-    let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, GROUND_SIZE * 5);
+    let camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        GROUND_SIZE * 5
+    );
     let renderer;
     let raycaster = new THREE.Raycaster();
     let ground_mesh;
@@ -54,7 +63,7 @@ function WintersEve(THREE, Stats, GLTFLoader) {
     // only loads if touch is available
     let m_controls = new SimpleMobileControls(camera, document);
     let snowMaterials = [];
-    let loading = '';
+    let loading = "";
     let stats;
 
     if (SHOW_STATS) {
@@ -118,7 +127,7 @@ function WintersEve(THREE, Stats, GLTFLoader) {
         document.getElementById("load_percent").innerHTML = loading;
         if (loading >= 100) {
             let elem = document.querySelector(".standard_notice");
-            elem.style.display = 'none';
+            elem.style.display = "none";
         }
     }
 
@@ -138,9 +147,9 @@ function WintersEve(THREE, Stats, GLTFLoader) {
             // do nothing atm
         };
         textureManager.onError = function (url) {
-            console.error('Failed to load texture ' + url);
+            console.error("Failed to load texture " + url);
         };
-        // textureLoader is a synchronous loader so we can throw it all the 
+        // textureLoader is a synchronous loader so we can throw it all the
         // texture requests at once without blocking
         groundTextureMap = textureLoader.load("assets/snow_ground.jpg");
         snowFlakeImage = textureLoader.load("assets/snowflake.png");
@@ -149,12 +158,15 @@ function WintersEve(THREE, Stats, GLTFLoader) {
         moonTexture = textureLoader.load("assets/moon_sd.png");
     }
 
-    window.addEventListener('resize', function () {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    }, false);
-
+    window.addEventListener(
+        "resize",
+        function () {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        },
+        false
+    );
 
     function setUpRenderer() {
         renderer = new THREE.WebGLRenderer();
@@ -176,7 +188,10 @@ function WintersEve(THREE, Stats, GLTFLoader) {
 
     function addMoon() {
         let spriteMap = moonTexture;
-        let spriteMaterial = new THREE.SpriteMaterial({map: spriteMap, color: 0xffffff});
+        let spriteMaterial = new THREE.SpriteMaterial({
+            map: spriteMap,
+            color: 0xffffff,
+        });
         moonSprite = new THREE.Sprite(spriteMaterial);
         moonSprite.position.copy(MOON_POS);
         moonSprite.scale.set(MOON_SCALE, MOON_SCALE, 1);
@@ -185,7 +200,7 @@ function WintersEve(THREE, Stats, GLTFLoader) {
 
     function addTrees() {
         if (GROUND_SIZE < 10000) {
-            console.log('GROUND_SIZE is too small to add trees');
+            console.log("GROUND_SIZE is too small to add trees");
             return;
         }
 
@@ -199,9 +214,14 @@ function WintersEve(THREE, Stats, GLTFLoader) {
 
         // add however many trees
         for (let i = 0; i < TREE_COUNT; i++) {
-            let randomVertex = vertices[Math.floor(Math.random() * vertices.length)];
+            let randomVertex =
+                vertices[Math.floor(Math.random() * vertices.length)];
             let tree = TF.simpleTree(treeTexture);
-            tree.position.set(randomVertex.x, randomVertex.y - snowDepth, randomVertex.z);
+            tree.position.set(
+                randomVertex.x,
+                randomVertex.y - snowDepth,
+                randomVertex.z
+            );
 
             // don't plant tree on the camera
             if (camera.position.distanceTo(tree.position) < 1000) {
@@ -239,7 +259,7 @@ function WintersEve(THREE, Stats, GLTFLoader) {
             }
         }
 
-        let loader = new GLTFLoader().setPath('assets/models/');
+        let loader = new GLTFLoader().setPath("assets/models/");
 
         let addTheWolf = function (gltf) {
             gltf.scene.scale.y = gltf.scene.scale.x = gltf.scene.scale.z = 15;
@@ -253,7 +273,10 @@ function WintersEve(THREE, Stats, GLTFLoader) {
             //update its matrix so the geometry shares the rotation
             let wolfMesh = gltf.scene.children[0];
             // wolf looks some random direction
-            wolfMesh.geometry.rotateZ(THREE.Math.randFloat(-Math.PI, Math.PI));
+            wolfMesh.geometry.rotateZ(
+                THREE.MathUtils.randFloat(-Math.PI, Math.PI)
+            );
+
             wolfMesh.castShadow = true;
             wolfMesh.updateMatrix();
             wolfMesh.geometry.computeVertexNormals();
@@ -266,12 +289,10 @@ function WintersEve(THREE, Stats, GLTFLoader) {
             console.error(e);
         };
 
-        loader.load('wolf_sitting.glb', addTheWolf, undefined, wolfLoadFail);
-
+        loader.load("wolf_sitting.glb", addTheWolf, undefined, wolfLoadFail);
 
         // add a few deer
         function createDeer(deerGLTF) {
-
             let deerMaterial = deerGLTF.scene.children[0].material;
             let deerMesh = deerGLTF.scene.children[0];
 
@@ -280,15 +301,19 @@ function WintersEve(THREE, Stats, GLTFLoader) {
 
             // add however many deer
             for (let i = 0; i < DEER_COUNT; i++) {
-
                 let scale = 10;
 
                 deerMesh.scale.set(scale, scale, scale);
 
-                let randomVertex = vertices[Math.floor(Math.random() * vertices.length)];
+                let randomVertex =
+                    vertices[Math.floor(Math.random() * vertices.length)];
 
                 // 37.5 is cheating, I know what the height is, should be checked
-                deerMesh.position.set(randomVertex.x, randomVertex.y + 37.5, randomVertex.z);
+                deerMesh.position.set(
+                    randomVertex.x,
+                    randomVertex.y + 37.5,
+                    randomVertex.z
+                );
                 //deerMesh.rotation.set(0, Math.random() * Math.PI, 0);
                 deerMesh.castShadow = true;
                 deerMesh.receiveShadow = true;
@@ -299,10 +324,10 @@ function WintersEve(THREE, Stats, GLTFLoader) {
 
                 // need to put on my modeler/animator height and make some new deer
                 // but no animal animations atm
-//                deerAnimMixer.clipAction(deerGeometry.animations[ 0 ], mesh)
-//                        .setDuration(10)			// one second
-//                        .startAt(0)	// random phase (already running)
-//                        .play();
+                //                deerAnimMixer.clipAction(deerGeometry.animations[ 0 ], mesh)
+                //                        .setDuration(10)			// one second
+                //                        .startAt(0)	// random phase (already running)
+                //                        .play();
             }
             updateLoadingPercent();
         }
@@ -334,20 +359,29 @@ function WintersEve(THREE, Stats, GLTFLoader) {
 
             for (let c = 0; c < SNOWFLAKES; c++) {
                 let x = Math.random() * GROUND_SIZE;
-                let y = Math.random() * SKY_HEIGHT / 2;
+                let y = (Math.random() * SKY_HEIGHT) / 2;
                 let z = Math.random() * GROUND_SIZE;
                 snowVertices.push(x, y, z);
             }
 
-            snowGeometry.setAttribute('position', new THREE.Float32BufferAttribute(snowVertices, 3));
+            snowGeometry.setAttribute(
+                "position",
+                new THREE.Float32BufferAttribute(snowVertices, 3)
+            );
             // size of snowflake
             let size = getRangeRandom(15, 20);
 
-            snowMaterials[ i ] = new THREE.PointsMaterial({size: size, map: snowFlakeImage, blending: THREE.AdditiveBlending, depthTest: false, transparent: true});
+            snowMaterials[i] = new THREE.PointsMaterial({
+                size: size,
+                map: snowFlakeImage,
+                blending: THREE.AdditiveBlending,
+                depthTest: false,
+                transparent: true,
+            });
             // a brightness of 0.5 to 1 of white
-            snowMaterials[ i ].color.setHSL(0, 0, Math.random() * 0.5 + 0.5);
+            snowMaterials[i].color.setHSL(0, 0, Math.random() * 0.5 + 0.5);
 
-            let particles = new THREE.Points(snowGeometry, snowMaterials[ i ]);
+            let particles = new THREE.Points(snowGeometry, snowMaterials[i]);
 
             particles.position.x = -GROUND_SIZE / 2;
             particles.position.z = -GROUND_SIZE / 2;
@@ -379,14 +413,13 @@ function WintersEve(THREE, Stats, GLTFLoader) {
         directionalLight.shadow.camera.bottom = -5000;
         directionalLight.shadow.camera.right = 5000;
         directionalLight.shadow.camera.top = 5000;
-        directionalLight.shadow.mapSize.width = 2048;  // default
+        directionalLight.shadow.mapSize.width = 2048; // default
         directionalLight.shadow.mapSize.height = 2048; // default
-        directionalLight.shadow.camera.near = 0.5;    // default
-        directionalLight.shadow.camera.far = GROUND_SIZE * 2;     // default
+        directionalLight.shadow.camera.near = 0.5; // default
+        directionalLight.shadow.camera.far = GROUND_SIZE * 2; // default
 
         scene.add(directionalLight);
     }
-
 
     // Camera starts in the center of world and the position height is modified
     // later based on terrain height when the terrain at that point
@@ -401,14 +434,20 @@ function WintersEve(THREE, Stats, GLTFLoader) {
     function addSky() {
         // load and add the skybox
         let envMap = new THREE.CubeTextureLoader()
-                .setPath('assets/skyboxes/forest/')
-                .load(['posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg']);
+            .setPath("assets/skyboxes/forest/")
+            .load([
+                "posx.jpg",
+                "negx.jpg",
+                "posy.jpg",
+                "negy.jpg",
+                "posz.jpg",
+                "negz.jpg",
+            ]);
 
         scene.background = envMap;
     }
 
     function addGround() {
-
         // GROUND TEXTURE
         const TEXTURE_REPEAT = 10;
 
@@ -425,7 +464,7 @@ function WintersEve(THREE, Stats, GLTFLoader) {
             bumpMap: groundTextureMap,
             bumpScale: 5,
             flatShading: false,
-            fog: true
+            fog: true,
         });
 
         // Over in utilities.js
@@ -433,7 +472,10 @@ function WintersEve(THREE, Stats, GLTFLoader) {
         // the "height" values of ALL of the image pixels.  The image is an actual
         // img tag in the html with display none.  This means it's already loaded and
         // we can use anything that works in an img tag
-        let terrain = KCD_PixelData.getPixelData('heightmap_image', 'heightmap_canvas');
+        let terrain = KCD_PixelData.getPixelData(
+            "heightmap_image",
+            "heightmap_canvas"
+        );
 
         // SAFE_CAM_HEIGHT is for saving the highest z vertex in the ground model with player
         // (camera) height to it so at load the camera is 100 units above the ground below it
@@ -443,16 +485,21 @@ function WintersEve(THREE, Stats, GLTFLoader) {
          * PlaneGeometry(width : Float, height : Float, widthSegments : Integer, heightSegments : Integer)
          * width — Width along the X axis. Default is 1.
          * height — Height along the Y axis. Default is 1.
-         * widthSegments — Optional. Default is 1. 
+         * widthSegments — Optional. Default is 1.
          * heightSegments — Optional. Default is 1.
-         * 
+         *
          * Our heightmap is a component of our structure and simply an array of data
          * more than an image: Keep in mind that the ground_mesh geometry always has +1 more vertices
          * than segments. If there's 100 x 100 segments means 101 x 101 vertices, etc,.
          * This means that the texture image should always be +1 width and height to
          * the segments and that number is sent back with the pixel data
          */
-        terrain_geometry = new THREE.PlaneGeometry(GROUND_SIZE, GROUND_SIZE, terrain.segments, terrain.segments);
+        terrain_geometry = new THREE.PlaneGeometry(
+            GROUND_SIZE,
+            GROUND_SIZE,
+            terrain.segments,
+            terrain.segments
+        );
         terrain_geometry.userData.vertices = [];
 
         // actually create and add the ground
@@ -473,7 +520,7 @@ function WintersEve(THREE, Stats, GLTFLoader) {
         // here we apply the height information from the image to the PlaneGeometry.
         // So modifying the Y position of all vertices to show ground height according
         // to our map
-        const positionAttribute = terrain_geometry.getAttribute('position');
+        const positionAttribute = terrain_geometry.getAttribute("position");
 
         for (let i = 0; i < positionAttribute.count; i++) {
             // temp vertex holder
@@ -496,7 +543,6 @@ function WintersEve(THREE, Stats, GLTFLoader) {
             terrain_geometry.userData.vertices.push(vertex);
         }
 
-
         // set camera to the safe height to start
         camera.position.setY(SAFE_CAM_HEIGHT);
 
@@ -505,7 +551,7 @@ function WintersEve(THREE, Stats, GLTFLoader) {
     }
 
     function addSnowman() {
-        let loader = new GLTFLoader().setPath('assets/models/');
+        let loader = new GLTFLoader().setPath("assets/models/");
 
         let grabSnowman = function (gltf) {
             gltf.scene.scale.y = gltf.scene.scale.x = gltf.scene.scale.z = 120;
@@ -514,11 +560,16 @@ function WintersEve(THREE, Stats, GLTFLoader) {
             gltf.scene.position.setZ(15);
 
             snowman = gltf.scene;
-            
+
             // set up the animations
             snowman.userData.isWalking = false;
-            snowman.userData.animator = new KCD_Animator(THREE, snowman, gltf.animations, 'Idle');
-            
+            snowman.userData.animator = new KCD_Animator(
+                THREE,
+                snowman,
+                gltf.animations,
+                "Idle"
+            );
+
             // shadow makes it all real
             gltf.scene.traverse(function (node) {
                 if (node.isMesh) {
@@ -533,7 +584,7 @@ function WintersEve(THREE, Stats, GLTFLoader) {
             console.error(e);
         };
 
-        loader.load('snowman.glb', grabSnowman, undefined, snowmanLoadFail);
+        loader.load("snowman.glb", grabSnowman, undefined, snowmanLoadFail);
     }
 
     function upDateParticles() {
@@ -552,7 +603,11 @@ function WintersEve(THREE, Stats, GLTFLoader) {
     function updateSnowman() {
         if (snowman) {
             // get the ground y, 1000 is fairly arbitrary
-            var castFrom = new THREE.Vector3(snowman.position.x, snowman.position.y + 1000, snowman.position.z);
+            var castFrom = new THREE.Vector3(
+                snowman.position.x,
+                snowman.position.y + 1000,
+                snowman.position.z
+            );
             raycaster.set(castFrom, DOWN_VECTOR);
             let intersects = raycaster.intersectObject(ground_mesh);
             if (intersects.length > 0) {
@@ -561,7 +616,11 @@ function WintersEve(THREE, Stats, GLTFLoader) {
             }
 
             // snowman always looks at the camera (player)
-            snowman.lookAt(camera.position.x, camera.position.y - 100, camera.position.z);
+            snowman.lookAt(
+                camera.position.x,
+                camera.position.y - 100,
+                camera.position.z
+            );
 
             // should snowman be moving towards player
             if (snowman.position.distanceTo(camera.position) > 500) {
@@ -570,14 +629,13 @@ function WintersEve(THREE, Stats, GLTFLoader) {
 
                 // if the snowman isn't walking animation atm, he should be
                 if (!snowman.userData.isWalking) {
-                    snowman.userData.animator.fadeToAction('Walk', 0.5);
+                    snowman.userData.animator.fadeToAction("Walk", 0.5);
                     snowman.userData.isWalking = true;
                 }
-            }
-            else {
+            } else {
                 // if the snowman is walking animation atm, he shouldn't be
                 if (snowman.userData.isWalking) {
-                    snowman.userData.animator.fadeToAction('Idle', 0.5);
+                    snowman.userData.animator.fadeToAction("Idle", 0.5);
                     snowman.userData.isWalking = false;
                 }
             }
@@ -585,7 +643,6 @@ function WintersEve(THREE, Stats, GLTFLoader) {
 
             if (snowman.userData.animator.mixer)
                 snowman.userData.animator.mixer.update(dt);
-
         }
     }
 
@@ -623,8 +680,7 @@ function WintersEve(THREE, Stats, GLTFLoader) {
         updateSnowman();
 
         // touch controls
-        if (m_controls.touch_present)
-            m_controls.updateMobileCameraMotion();
+        if (m_controls.touch_present) m_controls.updateMobileCameraMotion();
 
         requestAnimationFrame(render);
 
