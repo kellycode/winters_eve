@@ -4,8 +4,8 @@ Organized everything into classes and took a less weeeee-this-is-fun approach.
 
 Added and Mixamo animated a "player" character with a basic chase camera
 Sketchfab snoopy model courtesy of "Daz" Darren Hogan.  He animated it but
-I wanted to use Mixamo animations
-via https://sketchfab.com/3d-models/snoopy-df94fc680c404ffeb0a7b864958600a5
+I wanted to use Mixamo animations.  Snoopy sourced via
+https://sketchfab.com/3d-models/snoopy-df94fc680c404ffeb0a7b864958600a5
 
 TODOs: work on the deer and wolf and their animations and that's up next
 
