@@ -24,4 +24,4 @@ I had a lot of fun making it.
 - Custom trees built from primitives objects randomly placed
 - Generic Skybox
 - Moon Sprite
-- Falling snow (looks nice but inefficient)
+- Falling snow (looks nice but probably not as efficient as I'd like)
