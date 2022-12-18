@@ -1,0 +1,110 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-family: Verdana;
+    background-color: #192533;
+    position: relative;
+    overflow: hidden;
+}
+
+#loading_info {
+    width: 100%;
+    /*easy auto height*/
+    display:table;
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    padding: 20px;
+    color: antiquewhite;
+    opacity: 0.5;
+    z-index: 2;
+}
+
+#loading_info span {
+
+}
+
+#no_js_info {
+    width: 300px;
+    height: 100px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-right: -50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: antiquewhite;
+    z-index: 2;
+}
+
+#no_js_info h2 {
+    margin: 0px;
+}
+
+.no_js_notice {
+    display: none;
+    line-height: 40px;
+}
+
+html.no_js .no_js_notice {
+    display: block;
+}
+
+html.no_js #no_js_info .standard_notice,
+#wasd {
+    display: none;
+}
+
+#heightmap_canvas {
+    display: none;
+}
+
+#heightmap_image {
+    display: none;
+}
+
+@keyframes vanish {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes appear {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+#wasd {
+    position: absolute;
+    top: 75%;
+    margin-top: -56px;
+    left: 50%;
+    margin-left: -85px;
+    z-index: 2;
+    opacity: 1;
+    animation-name: vanish;
+    animation-duration: 5s;
+    animation-fill-mode: forwards;
+}
+
+html.has_touch #wasd {
+    display: none;
+}
+
+#render_canvas {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 1;
+}
