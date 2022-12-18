@@ -9,7 +9,7 @@ https://sketchfab.com/3d-models/snoopy-df94fc680c404ffeb0a7b864958600a5
 
 TODOs: work on the deer and wolf and their animations and that's up next
 
-Relaxing at home on a cold November day and looking out at dull houses and streets, I wanted to see this snowy winter scene
+Relaxing at home on a cold December day and looking out at dull houses and streets, I wanted to see this snowy winter scene
 
 I had a lot of fun making it.
 
