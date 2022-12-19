@@ -79,10 +79,11 @@ function WintersEve(THREE) {
 
         if (type === 'models') {
             [WOLF_GLB, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB] = result;
+            updateLoadingProgress("models preloaded");
             M_LOADED = true;
         } else if (type === 'textures') {
             [SNOW_GROUND, SNOWFLAKE, SNOW_BRANCH, FUR, MOON] = result;
-            updateLoadingProgress("textures loaded");
+            updateLoadingProgress("textures preloaded");
             T_LOADED = true;
         }
 
@@ -134,12 +135,16 @@ function WintersEve(THREE) {
     function loadScene() {
         // scene basics
         SET_MANAGER.initLights(SCENE);
+        updateLoadingProgress("lights in");
+        
         SET_MANAGER.initSky(SCENE);
+        updateLoadingProgress("sky in");
+        
         SET_MANAGER.addGround(SNOW_GROUND, CONSTANTS, GROUND_DATA);
-        updateLoadingProgress("sky loaded");
+        updateLoadingProgress("ground in");
 
         PLAYER = ACTOR_MANAGER.addPlayer(SNOOPY_GLB, SAFE_CAM_HEIGHT, PLAYER_MIXER);
-        updateLoadingProgress("player loaded");
+        updateLoadingProgress("player in");
 
         // CONTROLLERS
         // standard keyboard controls always loaded
@@ -148,28 +153,28 @@ function WintersEve(THREE) {
         if (TOUCH_ENVIRON) {
             PLAYER_MOBILE_CONTROLS = new PlayerTouchControls(PLAYER, document);
         }
-        updateLoadingProgress("controls loaded");
+        updateLoadingProgress("controls in");
 
         SNOWMAN = ACTOR_MANAGER.addSnowman(SNOWMAN_GLB);
-        updateLoadingProgress("snowman loaded");
+        updateLoadingProgress("snowman in");
 
         // wolf requires the ground high point so
         // must be loaded after the ground
         PROP_MANAGER.addTheWolf(WOLF_GLB, FUR, GROUND_DATA);
-        updateLoadingProgress("wolf loaded");
+        updateLoadingProgress("wolf in");
 
         PROP_MANAGER.addTheDeer(DEER_GLB, GROUND_DATA)
-        updateLoadingProgress("deer loaded");
+        updateLoadingProgress("deer in");
 
         PROP_MANAGER.addFallingSnow(SNOWFLAKE, SNOWSTORMS);
-        updateLoadingProgress("snowfall loaded");
+        updateLoadingProgress("snowfall in");
 
         PROP_MANAGER.addMoon(MOON);
-        updateLoadingProgress("moon loaded");
+        updateLoadingProgress("moon in");
 
         // trees loaded after ground and player
         PROP_MANAGER.addTrees(GROUND_DATA, CAMERA, SNOW_BRANCH);
-        updateLoadingProgress("trees loaded");
+        updateLoadingProgress("trees in");
 
         updateLoadingProgress("render started");
         render();
@@ -192,18 +197,21 @@ function WintersEve(THREE) {
 
 
     function getPlayerForwardMotion(PLAYER_KEY_CONTROLS) {
-        if (PLAYER_KEY_CONTROLS.player_motion.movingForward && !PLAYER.userData.isWalking) {
+        let forward = PLAYER_KEY_CONTROLS.player_action.moveForward;
+        let backward = PLAYER_KEY_CONTROLS.player_action.moveBack;
+        
+        if ((forward || backward) && !PLAYER.userData.isWalking) {
             PLAYER.userData.animator.fadeToAction("walk", 0.5);
             PLAYER.userData.isWalking = true;
-        } else if (!PLAYER_KEY_CONTROLS.player_motion.movingForward && PLAYER.userData.isWalking) {
+        } else if (!(forward || backward) && PLAYER.userData.isWalking) {
             PLAYER.userData.animator.fadeToAction("idle", 0.5);
             PLAYER.userData.isWalking = false;
         }
 
-        var dt = PLAYER_CLOCK.getDelta();
+        let delta = PLAYER_CLOCK.getDelta();
 
         if (PLAYER.userData.animator.mixer) {
-            PLAYER.userData.animator.mixer.update(dt);
+            PLAYER.userData.animator.mixer.update(delta);
         }
     }
 

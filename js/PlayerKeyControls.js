@@ -14,10 +14,6 @@ PlayerKeyControls = function (player, domElement) {
         strafeRight: false
     };
 
-    this.player_motion = {
-        movingForward: false
-    };
-
     this.USER_MOVE_SPEED = 20;
     this.USER_TURN_SPEED = 0.05;
     this.PLAYER_HEIGHT = 100;
@@ -27,7 +23,6 @@ PlayerKeyControls = function (player, domElement) {
             case 87: /*W*/
             case 38 /*up arrow*/:
                 scope.player_action.moveForward = true;
-                scope.player_motion.movingForward = true;
                 break;
             case 68: /*D*/
             case 39 /*right arrow*/:
@@ -61,7 +56,6 @@ PlayerKeyControls = function (player, domElement) {
             case 87: /*W*/
             case 38 /*up arrow*/:
                 scope.player_action.moveForward = false;
-                scope.player_motion.movingForward = false;
                 break;
             case 68: /*D*/
             case 39 /*right arrow*/:
