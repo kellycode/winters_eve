@@ -11,11 +11,11 @@ PlayerKeyControls = function (player, domElement) {
         turnLeft: false,
         turnRight: false,
         strafeLeft: false,
-        strafeRight: false,
+        strafeRight: false
     };
 
     this.player_motion = {
-        movingForward: false,
+        movingForward: false
     };
 
     this.USER_MOVE_SPEED = 20;

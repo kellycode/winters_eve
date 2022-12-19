@@ -25,3 +25,10 @@ I had a lot of fun making it.
 - Generic Skybox
 - Moon Sprite
 - Falling snow (looks nice but probably not as efficient as I'd like)
+
+
+TODOs:
+update touch controls
+handle backward and side animation
+
+
