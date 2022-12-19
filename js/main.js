@@ -16,8 +16,6 @@ function WintersEve(THREE) {
     let PRELOAD_MANAGER = new PreloadManager(THREE, CONSTANTS);
     let ACTOR_MANAGER = new ActorManager(THREE, CONSTANTS, SCENE);
 
-    let TOUCH_ENVIRON = false;
-
     // initialized in SetManager addGround() and contains
     // the ground GEOMETRY, MESH, SAFE_CAM_HEIGHT, HIGHPOINT
     let GROUND_DATA = {};
@@ -148,7 +146,7 @@ function WintersEve(THREE) {
         PLAYER_KEY_CONTROLS = new PlayerKeyControls(PLAYER, document);
         // if it's a touch environ add those controls
         if (TOUCH_ENVIRON) {
-            PLAYER_MOBILE_CONTROLS = new PlayerTouchControls(this.PLAYER, document);
+            PLAYER_MOBILE_CONTROLS = new PlayerTouchControls(PLAYER, document);
         }
         updateLoadingProgress("controls loaded");
 

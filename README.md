@@ -28,7 +28,6 @@ I had a lot of fun making it.
 
 
 TODOs:
-update touch controls
 handle backward and side animation
 
 

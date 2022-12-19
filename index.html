@@ -35,6 +35,7 @@
 
         <!-- Checks for JavaScript and Touch -->
         <script>
+            let TOUCH_ENVIRON = false;
             // by default we have no_js
             let _h = document.getElementsByTagName("html")[0];
             _h.className = _h.className.replace(/\bno_js\b/, "has_js");
@@ -42,7 +43,7 @@
             try {
                 document.createEvent("TouchEvent");
                 _h.className = _h.className.replace(/\bno_touch\b/, "has_touch");
-                TOUCH_ENVIRON = false;
+                TOUCH_ENVIRON = true;
             } catch (e) {
                 // do nothing
             }
