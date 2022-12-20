@@ -201,6 +201,8 @@ function WintersEve(THREE) {
         let backward = PLAYER_KEY_CONTROLS.player_action.moveBack;
         let left = PLAYER_KEY_CONTROLS.player_action.strafeLeft;
         let right = PLAYER_KEY_CONTROLS.player_action.strafeRight;
+        let turnLeft = PLAYER_KEY_CONTROLS.player_action.turnLeft;
+        let turnRight = PLAYER_KEY_CONTROLS.player_action.turnRight;
         
         if ((forward || backward) && !PLAYER.userData.isWalking) {
             PLAYER.userData.animator.fadeToAction("walk", 0.5);
@@ -210,18 +212,18 @@ function WintersEve(THREE) {
             PLAYER.userData.isWalking = false;
         }
         
-        if(left && !PLAYER.userData.isStrafeLeft) {
+        if((left || turnLeft) && !PLAYER.userData.isStrafeLeft) {
             PLAYER.userData.animator.fadeToAction("strafe_left", 0.5);
             PLAYER.userData.isStrafeLeft = true;
-        } else if (!left && PLAYER.userData.isStrafeLeft) {
+        } else if (!(left || turnLeft) && PLAYER.userData.isStrafeLeft) {
             PLAYER.userData.animator.fadeToAction("idle", 0.5);
             PLAYER.userData.isStrafeLeft = false;
         }
         
-        if(right && !PLAYER.userData.isStrafeRight) {
+        if((right || turnRight) && !PLAYER.userData.isStrafeRight) {
             PLAYER.userData.animator.fadeToAction("strafe_right", 0.5);
             PLAYER.userData.isStrafeRight = true;
-        } else if (!right && PLAYER.userData.isStrafeRight) {
+        } else if (!(right || turnRight) && PLAYER.userData.isStrafeRight) {
             PLAYER.userData.animator.fadeToAction("idle", 0.5);
             PLAYER.userData.isStrafeRight = false;
         }
