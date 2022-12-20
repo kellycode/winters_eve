@@ -30,6 +30,8 @@ class ActorManager {
         });
 
         this.PLAYER.userData.isWalking = false;
+        this.PLAYER.userData.isStrafeLeft = false;
+        this.PLAYER.userData.isStrafeRight = false;
         this.PLAYER.userData.animator = new Animator(
               THREE,
               this.PLAYER,

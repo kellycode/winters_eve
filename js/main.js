@@ -44,7 +44,7 @@ function WintersEve(THREE) {
         'wolf_sitting.glb',
         'deer.glb',
         'snowman_walk_idle.glb',
-        'snoopy_walk_idle.glb'];
+        'snoopy_walk_idle_left_right.glb'];
 
     // textures
     let T_PRELOADS = [
@@ -199,6 +199,8 @@ function WintersEve(THREE) {
     function getPlayerForwardMotion(PLAYER_KEY_CONTROLS) {
         let forward = PLAYER_KEY_CONTROLS.player_action.moveForward;
         let backward = PLAYER_KEY_CONTROLS.player_action.moveBack;
+        let left = PLAYER_KEY_CONTROLS.player_action.strafeLeft;
+        let right = PLAYER_KEY_CONTROLS.player_action.strafeRight;
         
         if ((forward || backward) && !PLAYER.userData.isWalking) {
             PLAYER.userData.animator.fadeToAction("walk", 0.5);
@@ -206,6 +208,22 @@ function WintersEve(THREE) {
         } else if (!(forward || backward) && PLAYER.userData.isWalking) {
             PLAYER.userData.animator.fadeToAction("idle", 0.5);
             PLAYER.userData.isWalking = false;
+        }
+        
+        if(left && !PLAYER.userData.isStrafeLeft) {
+            PLAYER.userData.animator.fadeToAction("strafe_left", 0.5);
+            PLAYER.userData.isStrafeLeft = true;
+        } else if (!left && PLAYER.userData.isStrafeLeft) {
+            PLAYER.userData.animator.fadeToAction("idle", 0.5);
+            PLAYER.userData.isStrafeLeft = false;
+        }
+        
+        if(right && !PLAYER.userData.isStrafeRight) {
+            PLAYER.userData.animator.fadeToAction("strafe_right", 0.5);
+            PLAYER.userData.isStrafeRight = true;
+        } else if (!right && PLAYER.userData.isStrafeRight) {
+            PLAYER.userData.animator.fadeToAction("idle", 0.5);
+            PLAYER.userData.isStrafeRight = false;
         }
 
         let delta = PLAYER_CLOCK.getDelta();
