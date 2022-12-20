@@ -197,11 +197,14 @@ function WintersEve(THREE) {
 
 
     function getPlayerForwardMotion(PLAYER_KEY_CONTROLS) {
+        // forward and backward use the same animation
         let forward = PLAYER_KEY_CONTROLS.player_action.moveForward;
         let backward = PLAYER_KEY_CONTROLS.player_action.moveBack;
+        // strafeLeft and turnLeft: same animation
         let left = PLAYER_KEY_CONTROLS.player_action.strafeLeft;
-        let right = PLAYER_KEY_CONTROLS.player_action.strafeRight;
         let turnLeft = PLAYER_KEY_CONTROLS.player_action.turnLeft;
+        // strafeRight and turnRight: same animation
+        let right = PLAYER_KEY_CONTROLS.player_action.strafeRight;
         let turnRight = PLAYER_KEY_CONTROLS.player_action.turnRight;
         
         if ((forward || backward) && !PLAYER.userData.isWalking) {
