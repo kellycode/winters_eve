@@ -1,13 +1,4 @@
-December 2022 Major Update
-
-Organized everything into classes and took a less weeeee-this-is-fun approach.
-
-Added and Mixamo animated a "player" character with a basic chase camera
-Sketchfab snoopy model courtesy of "Daz" Darren Hogan.  He animated it but
-I wanted to use Mixamo animations.  Snoopy sourced via
-https://sketchfab.com/3d-models/snoopy-df94fc680c404ffeb0a7b864958600a5
-
-TODOs: work on the deer and wolf and their animations and that's up next
+December 2022 Major update organized everything and added a 'player' Snoopy character with a basic chase camera
 
 Relaxing at home on a cold December day and looking out at dull houses and streets, I wanted to see this snowy winter scene
 
@@ -26,8 +17,13 @@ I had a lot of fun making it.
 - Moon Sprite
 - Falling snow (looks nice but probably not as efficient as I'd like)
 
+TODOs: work on the deer and wolf and their animations and that's up next
 
-TODOs:
-handle backward and side animation
+Snoopy:
+https://sketchfab.com/3d-models/snoopy-df94fc680c404ffeb0a7b864958600a5
+
+Snowman:
+https://www.turbosquid.com/3d-models/snowman-snow-man-3ds-free/987007
+
 
 
