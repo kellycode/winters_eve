@@ -13,10 +13,13 @@
 
         <link rel="stylesheet" href="css/styles.css" />
         
-        <!-- THREE (always loads the latest build)-->
-        <script src="https://threejs.org/build/three.min.js" ></script>
-        <script src="https://threejs.org/examples/js/libs/stats.min.js" ></script>
-        <script src="https://threejs.org/examples/js/loaders/GLTFLoader.js" ></script>
+        <!--
+        THREE V148 forces module use. I, and the major companies
+        I work for, regard modules as a huge security risk
+        -->
+        <script src="js/THREE/three.min.js"></script>
+        <script src="js/THREE/stats.min.js"></script>
+        <script src="js/THREE/GLTFLoader.js"></script>
         
         <!-- Ours -->
         <script src="js/Animator.js" ></script>

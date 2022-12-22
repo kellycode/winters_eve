@@ -16,8 +16,6 @@ class PropManager
         wolf.position.copy(GROUND_DATA.HIGHPOINT);
 
         let wolfMaterial = wolf.children[0].material;
-        wolfMaterial.morphTargets = true;
-        wolfMaterial.color.setHex(0x8b6e4f);
         wolfMaterial.map = FUR;
 
         //update its matrix so the geometry shares the rotation
@@ -32,34 +30,32 @@ class PropManager
         this.scene.add(wolf);
     }
 
-    addTheDeer = function (DEER_GLB, GROUND_DATA) {
+    addTheDeer = function (DEER_GLB, GROUND_DATA, DEER) {
         // unused atm for future ref
         // let deerAnimMixer = new this.THREE.AnimationMixer(this.scene);
 
         let vertices = GROUND_DATA.GEOMETRY.userData.vertices;
-        let deerMaterial = DEER_GLB.scene.children[0].material;
         let deerMesh = DEER_GLB.scene.children[0];
-
-        deerMaterial.morphTargets = true;
-        deerMaterial.color.setHex(0x774f25);
 
         // add however many deer
         for (let i = 0; i < this.CONSTANTS.DEER_COUNT; i++) {
-            let scale = 10;
+            let scale = 1;
+            
+            deerMesh = DEER_GLB.scene.children[0].clone();
 
             deerMesh.scale.set(scale, scale, scale);
 
             let randomVertex = vertices[Math.floor(Math.random() * vertices.length)];
 
-            // 37.5 is cheating, I know what the height is, should be checked
-            deerMesh.position.set(randomVertex.x, randomVertex.y + 37.5, randomVertex.z);
-            //deerMesh.rotation.set(0, Math.random() * Math.PI, 0);
+            deerMesh.position.set(randomVertex.x, randomVertex.y, randomVertex.z);
+
             deerMesh.castShadow = true;
             deerMesh.receiveShadow = true;
-            //deerMesh.geometry.dynamic = true;
-            deerMesh.geometry.computeVertexNormals();
+            
+            let r = Math.random() * Math.PI * 2;
+            deerMesh.rotateZ(r);
 
-            this.scene.add(DEER_GLB.scene.clone());
+            this.scene.add(deerMesh);
 
             // need to put on my modeler/animator height and make some new deer
             // but no animal animations atm

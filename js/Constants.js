@@ -26,7 +26,7 @@ class SceneConstants
         this.SHOW_STATS = false;
 
         // how many
-        this.DEER_COUNT = 10;
+        this.DEER_COUNT = 50;
         this.SNOWFLAKES = 50000;
         this.TREE_COUNT = 100;
         this.TREE_SINK = 100;
@@ -38,7 +38,7 @@ class SceneConstants
         this.CAMERA_FAR = this.GROUND_SIZE * 5;
 
         this.LIGHT_SPECS = {
-            ALIGHT_COLOR: 0x222222,
+            ALIGHT_COLOR: 0x444444,
             DLIGHT_COLOR: 0x455767,
             DLIGHT_POS: this.MOONLIGHT_POS,
             DLIGHT_CAST: true,

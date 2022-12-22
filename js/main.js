@@ -38,11 +38,13 @@ function WintersEve(THREE) {
     // Props and Actors
     let WOLF_GLB, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB;
     let SNOW_GROUND, SNOWFLAKE, SNOW_BRANCH, FUR, MOON;
+    
+    let DEER = [];
 
     // models
     let M_PRELOADS = [
         'wolf_sitting.glb',
-        'deer.glb',
+        'new_deer.glb',
         'snowman_walk_idle.glb',
         'snoopy_walk_idle_left_right.glb'];
 
@@ -163,7 +165,7 @@ function WintersEve(THREE) {
         PROP_MANAGER.addTheWolf(WOLF_GLB, FUR, GROUND_DATA);
         updateLoadingProgress("wolf in");
 
-        PROP_MANAGER.addTheDeer(DEER_GLB, GROUND_DATA)
+        PROP_MANAGER.addTheDeer(DEER_GLB, GROUND_DATA, DEER)
         updateLoadingProgress("deer in");
 
         PROP_MANAGER.addFallingSnow(SNOWFLAKE, SNOWSTORMS);

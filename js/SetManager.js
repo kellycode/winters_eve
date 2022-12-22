@@ -85,6 +85,8 @@ class SetManager
             bumpScale: 5,
             flatShading: false,
             fog: true
+            //opacity: 0.2,
+            //transparent: true
         });
 
         // Over in utilities.js
