@@ -68,8 +68,6 @@ function WintersEve(THREE) {
     let SNOWMAN;
     let PLAYER;
 
-    let PLAYER_CLOCK = new THREE.Clock();
-
     if (CONSTANTS.SHOW_STATS) {
         STATS = new Stats();
         document.body.appendChild(STATS.dom);
@@ -150,10 +148,10 @@ function WintersEve(THREE) {
 
         // CONTROLLERS
         // standard keyboard controls always loaded
-        PLAYER_KEY_CONTROLS = new PlayerKeyControls(PLAYER, document);
+        PLAYER_KEY_CONTROLS = new PlayerKeyControls(PLAYER, CONSTANTS, document);
         // if it's a touch environ add those controls
         if (TOUCH_ENVIRON) {
-            PLAYER_MOBILE_CONTROLS = new PlayerTouchControls(PLAYER, document);
+            PLAYER_MOBILE_CONTROLS = new PlayerTouchControls(PLAYER, CONSTANTS, document);
         }
         updateLoadingProgress("controls in");
 
@@ -197,50 +195,6 @@ function WintersEve(THREE) {
         PRELOAD_MANAGER.preloadModels(M_PRELOADS, setPreloadCompletions);
     }
 
-
-    function getPlayerForwardMotion(PLAYER_KEY_CONTROLS) {
-        // forward and backward use the same animation
-        let forward = PLAYER_KEY_CONTROLS.player_action.moveForward;
-        let backward = PLAYER_KEY_CONTROLS.player_action.moveBack;
-        // strafeLeft and turnLeft: same animation
-        let left = PLAYER_KEY_CONTROLS.player_action.strafeLeft;
-        let turnLeft = PLAYER_KEY_CONTROLS.player_action.turnLeft;
-        // strafeRight and turnRight: same animation
-        let right = PLAYER_KEY_CONTROLS.player_action.strafeRight;
-        let turnRight = PLAYER_KEY_CONTROLS.player_action.turnRight;
-        
-        if ((forward || backward) && !PLAYER.userData.isWalking) {
-            PLAYER.userData.animator.fadeToAction("walk", 0.5);
-            PLAYER.userData.isWalking = true;
-        } else if (!(forward || backward) && PLAYER.userData.isWalking) {
-            PLAYER.userData.animator.fadeToAction("idle", 0.5);
-            PLAYER.userData.isWalking = false;
-        }
-        
-        if((left || turnLeft) && !PLAYER.userData.isStrafeLeft) {
-            PLAYER.userData.animator.fadeToAction("strafe_left", 0.5);
-            PLAYER.userData.isStrafeLeft = true;
-        } else if (!(left || turnLeft) && PLAYER.userData.isStrafeLeft) {
-            PLAYER.userData.animator.fadeToAction("idle", 0.5);
-            PLAYER.userData.isStrafeLeft = false;
-        }
-        
-        if((right || turnRight) && !PLAYER.userData.isStrafeRight) {
-            PLAYER.userData.animator.fadeToAction("strafe_right", 0.5);
-            PLAYER.userData.isStrafeRight = true;
-        } else if (!(right || turnRight) && PLAYER.userData.isStrafeRight) {
-            PLAYER.userData.animator.fadeToAction("idle", 0.5);
-            PLAYER.userData.isStrafeRight = false;
-        }
-
-        let delta = PLAYER_CLOCK.getDelta();
-
-        if (PLAYER.userData.animator.mixer) {
-            PLAYER.userData.animator.mixer.update(delta);
-        }
-    }
-
-
     function render() {
         // simple gravity
         // use raycaster to keep camera on the ground
@@ -251,13 +205,13 @@ function WintersEve(THREE) {
             ACTOR_MANAGER.setPlayerChaseCameraPos(CAMERA)
             ACTOR_MANAGER.updateSnowman(PLAYER, GROUND_DATA);
             PLAYER_KEY_CONTROLS.updatePlayerPosition();
-            getPlayerForwardMotion(PLAYER_KEY_CONTROLS);
+            ACTOR_MANAGER.animatePlayerMotion(PLAYER_KEY_CONTROLS);
             // touch
             if (PLAYER_MOBILE_CONTROLS)
                 PLAYER_MOBILE_CONTROLS.updateMobileCameraMotion();
         }
 
-        if (CONSTANTS.SHOW_STATS) {
+        if (STATS) {
             STATS.update();
         }
 

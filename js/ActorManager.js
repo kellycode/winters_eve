@@ -30,8 +30,8 @@ class ActorManager {
         });
 
         this.PLAYER.userData.isWalking = false;
-        this.PLAYER.userData.isStrafeLeft = false;
-        this.PLAYER.userData.isStrafeRight = false;
+        this.PLAYER.userData.isLefting = false;
+        this.PLAYER.userData.isRighting = false;
         this.PLAYER.userData.animator = new Animator(
               THREE,
               this.PLAYER,
@@ -48,10 +48,66 @@ class ActorManager {
         });
 
         this.PLAYER.userData.raycaster = new this.THREE.Raycaster();
+        
+        this.PLAYER.userData.clock = new THREE.Clock();
 
         this.scene.add(this.PLAYER);
 
         return this.PLAYER;
+    }
+    
+    animatePlayerMotion(PLAYER_KEY_CONTROLS) {
+        
+        // check for keypress commands
+        // forward and backward use the same animation
+        let forward = PLAYER_KEY_CONTROLS.player_action.moveForward;
+        let backward = PLAYER_KEY_CONTROLS.player_action.moveBack;
+        // strafeLeft and turnLeft: same animation
+        let left = PLAYER_KEY_CONTROLS.player_action.strafeLeft;
+        let turnLeft = PLAYER_KEY_CONTROLS.player_action.turnLeft;
+        // strafeRight and turnRight: same animation
+        let right = PLAYER_KEY_CONTROLS.player_action.strafeRight;
+        let turnRight = PLAYER_KEY_CONTROLS.player_action.turnRight;
+        
+        // for prioritizing
+        let walking = forward || backward;
+        let lefting = left || turnLeft;
+        let righting = right || turnRight;
+        
+        let isWalking = this.PLAYER.userData.isWalking;
+        let isLefting = this.PLAYER.userData.isLefting;
+        let isRighting = this.PLAYER.userData.isRighting;
+
+        if (walking && !isWalking) {
+            this.PLAYER.userData.animator.fadeToAction("walk", 0.5);
+            this.PLAYER.userData.isWalking = true;
+            return;
+        } else if (!walking && isWalking) {
+            this.PLAYER.userData.animator.fadeToAction("idle", 0.5);
+            this.PLAYER.userData.isWalking = false;
+        }
+
+        if (lefting && !isLefting) {
+            this.PLAYER.userData.animator.fadeToAction("strafe_left", 0.5);
+            this.PLAYER.userData.isLefting = true;
+        } else if (!lefting && isLefting) {
+            this.PLAYER.userData.animator.fadeToAction("idle", 0.5);
+            this.PLAYER.userData.isLefting = false;
+        }
+
+        if (righting && !isRighting) {
+            this.PLAYER.userData.animator.fadeToAction("strafe_right", 0.5);
+            this.PLAYER.userData.isRighting = true;
+        } else if (!righting && isRighting) {
+            this.PLAYER.userData.animator.fadeToAction("idle", 0.5);
+            this.PLAYER.userData.isRighting = false;
+        }
+
+        let delta = this.PLAYER.userData.clock.getDelta();
+
+        if (this.PLAYER.userData.animator.mixer) {
+            this.PLAYER.userData.animator.mixer.update(delta);
+        }
     }
 
     setPlayerChaseCameraPos(CAMERA) {

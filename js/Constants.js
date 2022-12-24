@@ -3,6 +3,11 @@ class SceneConstants
     constructor(THREE) {
         this.THREE = THREE;
         
+        // player
+        this.PLAYER_MOVE_SPEED = 20;
+        this.PLAYER_TURN_SPEED = 0.05;
+        this.PLAYER_HEIGHT = 100;
+        
         // console, screen or none
         this.SHOW_LOADING_PROGRESS = 'screen';
 

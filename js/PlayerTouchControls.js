@@ -2,7 +2,7 @@
 
 
 
-PlayerTouchControls = function (camera, domElement) {
+PlayerTouchControls = function (camera, CONSTANTS, domElement) {
     let scope = this;
     scope.left;
     scope.right;
@@ -73,10 +73,6 @@ PlayerTouchControls = function (camera, domElement) {
         turnRight: false
     };
 
-    this.USER_MOVE_SPEED = 20;
-    this.USER_TURN_SPEED = 0.05;
-    this.PLAYER_HEIGHT = 100;
-
     this.onLeftMouseDown = function () {
         console.log('lmd');
         scope.mouse_action.leftDown = true;
@@ -100,12 +96,12 @@ PlayerTouchControls = function (camera, domElement) {
     this.updateMobileCameraMotion = function () {
 
         if (scope.mouse_action.leftDown && scope.mouse_action.rightDown) {
-            camera.position.z -= Math.cos(camera.rotation.y) * this.USER_MOVE_SPEED;
-            camera.position.x -= Math.sin(camera.rotation.y) * this.USER_MOVE_SPEED;
+            camera.position.z -= Math.cos(camera.rotation.y) * CONSTANTS.PLAYER_MOVE_SPEED;
+            camera.position.x -= Math.sin(camera.rotation.y) * CONSTANTS.PLAYER_MOVE_SPEED;
         } else if (scope.mouse_action.leftDown && !scope.mouse_action.rightDown) {
-            camera.rotation.y += this.USER_TURN_SPEED;
+            camera.rotation.y += CONSTANTS.PLAYER_TURN_SPEED;
         } else if (!scope.mouse_action.leftDown && scope.mouse_action.rightDown) {
-            camera.rotation.y -= this.USER_TURN_SPEED;
+            camera.rotation.y -= CONSTANTS.PLAYER_TURN_SPEED;
         }
     };
 
