@@ -30,8 +30,8 @@ class ActorManager {
         });
 
         this.PLAYER.userData.isWalking = false;
-        this.PLAYER.userData.isLefting = false;
-        this.PLAYER.userData.isRighting = false;
+        this.PLAYER.userData.isStrafeLeft = false;
+        this.PLAYER.userData.isStrafeRight = false;
         this.PLAYER.userData.animator = new Animator(
               THREE,
               this.PLAYER,
@@ -49,15 +49,39 @@ class ActorManager {
 
         this.PLAYER.userData.raycaster = new this.THREE.Raycaster();
 
-        this.PLAYER.userData.clock = new THREE.Clock();
-
         this.scene.add(this.PLAYER);
+        
+        this.PLAYER.clock = new THREE.Clock();
+        
+        this.PLAYER.userData.offset = 0;
 
         return this.PLAYER;
     }
 
+    updateChaseCamera(CAMERA) {
+        let lr_offset = CAMERA.userData.leftRightOffset;
+        let ud_offset = CAMERA.userData.upDownOffset;
+        
+        
+        let heightOffset = 100 + ud_offset
+        
+        //console.log(ud_offset)
+        
+        let rotZ = Math.cos(this.PLAYER.rotation.y + lr_offset);
+        let rotX = Math.sin(this.PLAYER.rotation.y + lr_offset);
+        
+        // behind from player
+        let distance = -200;
+        
+        CAMERA.position.x = this.PLAYER.position.x - distance * rotX;
+        // above player position
+        CAMERA.position.y = this.PLAYER.position.y + heightOffset;
+        CAMERA.position.z = this.PLAYER.position.z - distance * rotZ;
+
+        CAMERA.lookAt(this.PLAYER.position.x, this.PLAYER.position.y, this.PLAYER.position.z);
+    }
+    
     animatePlayerMotion(PLAYER_KEY_CONTROLS) {
-        // check for keypress requests
         // forward and backward use the same animation
         let forward = PLAYER_KEY_CONTROLS.player_action.moveForward;
         let backward = PLAYER_KEY_CONTROLS.player_action.moveBack;
@@ -68,69 +92,39 @@ class ActorManager {
         let right = PLAYER_KEY_CONTROLS.player_action.strafeRight;
         let turnRight = PLAYER_KEY_CONTROLS.player_action.turnRight;
 
-        // for prioritizing
-        let walkRequested = forward || backward;
-        let leftRequested = left || turnLeft;
-        let rightRequested = right || turnRight;
-
-        // doing now
-        let isWalking = this.PLAYER.userData.isWalking;
-        let isLefting = this.PLAYER.userData.isLefting;
-        let isRighting = this.PLAYER.userData.isRighting;
-        
-        // insure only one at a time
-        if (!isLefting && !isRighting) {
-            if (walkRequested && !isWalking) {
-                this.PLAYER.userData.animator.fadeToAction("walk", 0.5);
-                this.PLAYER.userData.isWalking = true;
-                return;
-            } else if (!walkRequested && isWalking) {
-                this.PLAYER.userData.animator.fadeToAction("idle", 0.5);
-                this.PLAYER.userData.isWalking = false;
-            }
+        if ((forward || backward) && !this.PLAYER.userData.isWalking) {
+            this.PLAYER.userData.animator.fadeToAction("walk", 0.5);
+            this.PLAYER.userData.isWalking = true;
+            return;
+        } else if (!(forward || backward) && this.PLAYER.userData.isWalking) {
+            this.PLAYER.userData.animator.fadeToAction("idle", 0.5);
+            this.PLAYER.userData.isWalking = false;
         }
 
-        if (!isWalking && !isRighting) {
-            if (leftRequested && !isLefting) {
-                this.PLAYER.userData.animator.fadeToAction("strafe_left", 0.5);
-                this.PLAYER.userData.isLefting = true;
-            } else if (!leftRequested && isLefting) {
-                this.PLAYER.userData.animator.fadeToAction("idle", 0.5);
-                this.PLAYER.userData.isLefting = false;
-            }
+        if ((left || turnLeft) && !this.PLAYER.userData.isStrafeLeft) {
+            this.PLAYER.userData.animator.fadeToAction("strafe_left", 0.5);
+            this.PLAYER.userData.isStrafeLeft = true;
+        } else if (!(left || turnLeft) && this.PLAYER.userData.isStrafeLeft) {
+            this.PLAYER.userData.animator.fadeToAction("idle", 0.5);
+            this.PLAYER.userData.isStrafeLeft = false;
         }
 
-        if (!isWalking && !isLefting) {
-            if (rightRequested && !isRighting) {
-                this.PLAYER.userData.animator.fadeToAction("strafe_right", 0.5);
-                this.PLAYER.userData.isRighting = true;
-            } else if (!rightRequested && isRighting) {
-                this.PLAYER.userData.animator.fadeToAction("idle", 0.5);
-                this.PLAYER.userData.isRighting = false;
-            }
+        if ((right || turnRight) && !this.PLAYER.userData.isStrafeRight) {
+            this.PLAYER.userData.animator.fadeToAction("strafe_right", 0.5);
+            this.PLAYER.userData.isStrafeRight = true;
+        } else if (!(right || turnRight) && this.PLAYER.userData.isStrafeRight) {
+            this.PLAYER.userData.animator.fadeToAction("idle", 0.5);
+            this.PLAYER.userData.isStrafeRight = false;
         }
 
-        let delta = this.PLAYER.userData.clock.getDelta();
+        let delta = this.PLAYER.clock.getDelta();
 
         if (this.PLAYER.userData.animator.mixer) {
             this.PLAYER.userData.animator.mixer.update(delta);
         }
     }
 
-    setPlayerChaseCameraPos(CAMERA) {
-        let rotZ = Math.cos(this.PLAYER.rotation.y);
-        let rotX = Math.sin(this.PLAYER.rotation.y);
-        // behind player
-        let distance = -200;
-        CAMERA.position.x = this.PLAYER.position.x - distance * rotX;
-        // above player position
-        CAMERA.position.y = this.PLAYER.position.y + 100;
-        CAMERA.position.z = this.PLAYER.position.z - distance * rotZ;
-
-        CAMERA.lookAt(this.PLAYER.position.x, this.PLAYER.position.y, this.PLAYER.position.z);
-    }
-
-    setPlayerOnGround(GROUND_DATA) {
+    updatePlayerOnGround(GROUND_DATA) {
         let castFrom = new this.THREE.Vector3(this.PLAYER.position.x, this.PLAYER.position.y + 1000, this.PLAYER.position.z);
 
         this.PLAYER.userData.raycaster.set(castFrom, this.CONSTANTS.DOWN_VECTOR);
@@ -138,7 +132,7 @@ class ActorManager {
 
         // if camera is above the ground
         if (intersects.length > 0) {
-            let camOffset = this.CONSTANTS.PLAYER_HEIGHT - intersects[0].distance;
+            let camOffset = this.CONSTANTS.PLAYER_RAYCAST_HEIGHT - intersects[0].distance;
             this.PLAYER.position.setY(this.PLAYER.position.y + camOffset);
         }
     }

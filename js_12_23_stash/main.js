@@ -21,8 +21,9 @@ function WintersEve(THREE) {
     let GROUND_DATA = {};
 
     // three
-    let CAMERA = SET_MANAGER.initCamera(THREE);
-    let RENDERER = SET_MANAGER.initRenderer(CAMERA, THREE);
+    let CHASE_CAMERA = SET_MANAGER.initCamera(THREE);
+    document.MOUSE_EVENTS = new MouseEvents(document, CHASE_CAMERA);
+    let RENDERER = SET_MANAGER.initRenderer(CHASE_CAMERA, THREE);
 
     let PLAYER_KEY_CONTROLS;
     let PLAYER_MOBILE_CONTROLS;
@@ -171,7 +172,7 @@ function WintersEve(THREE) {
         updateLoadingProgress("moon in");
 
         // trees loaded after ground and player
-        PROP_MANAGER.addTrees(GROUND_DATA, CAMERA, SNOW_BRANCH);
+        PROP_MANAGER.addTrees(GROUND_DATA, CHASE_CAMERA, SNOW_BRANCH);
         updateLoadingProgress("trees in");
 
         updateLoadingProgress("render started");
@@ -181,8 +182,8 @@ function WintersEve(THREE) {
     window.addEventListener(
           "resize",
           function () {
-              CAMERA.aspect = window.innerWidth / window.innerHeight;
-              CAMERA.updateProjectionMatrix();
+              CHASE_CAMERA.aspect = window.innerWidth / window.innerHeight;
+              CHASE_CAMERA.updateProjectionMatrix();
               RENDERER.setSize(window.innerWidth, window.innerHeight);
           },
           false
@@ -199,8 +200,8 @@ function WintersEve(THREE) {
         // casts down to see how far the ground and keeps
         // camera at PLAYER_HEIGHT units above it
         if (PLAYER && SNOWMAN) {
-            ACTOR_MANAGER.setPlayerOnGround(GROUND_DATA);
-            ACTOR_MANAGER.setPlayerChaseCameraPos(CAMERA)
+            ACTOR_MANAGER.updatePlayerOnGround(GROUND_DATA);
+            ACTOR_MANAGER.updateChaseCamera(CHASE_CAMERA)
             ACTOR_MANAGER.updateSnowman(PLAYER, GROUND_DATA);
             PLAYER_KEY_CONTROLS.updatePlayerPosition();
             ACTOR_MANAGER.animatePlayerMotion(PLAYER_KEY_CONTROLS);
@@ -209,7 +210,7 @@ function WintersEve(THREE) {
                 PLAYER_MOBILE_CONTROLS.updateMobileCameraMotion();
         }
 
-        if (STATS) {
+        if (CONSTANTS.SHOW_STATS) {
             STATS.update();
         }
 
@@ -226,7 +227,7 @@ function WintersEve(THREE) {
 
         requestAnimationFrame(render);
 
-        RENDERER.render(SCENE, CAMERA);
+        RENDERER.render(SCENE, CHASE_CAMERA);
     }
 
     init();

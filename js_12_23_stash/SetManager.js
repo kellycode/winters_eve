@@ -4,6 +4,7 @@ class SetManager
         this.THREE = THREE;
         this.CONSTANTS = CONSTANTS;
         this.scene = SCENE;
+        this.camera;
     }
 
     initRenderer(camera, THREE) {
@@ -26,13 +27,16 @@ class SetManager
     }
 
     initCamera(THREE) {
-        let camera = new THREE.PerspectiveCamera(
+        this.camera = new THREE.PerspectiveCamera(
               this.CONSTANTS.CAMERA_FOV,
               this.CONSTANTS.CAMERA_ASPECT,
               this.CONSTANTS.CAMERA_NEAR,
               this.CONSTANTS.CAMERA_FAR);
+        
+        this.camera.userData.leftRightOffset = 0.0;
+        this.camera.userData.upDownOffset = 0.0;
 
-        return camera;
+        return this.camera;
     }
 
     initLights() {
