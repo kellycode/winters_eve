@@ -22,7 +22,7 @@ function WintersEve(THREE) {
 
     // three
     let CAMERA = SET_MANAGER.initCamera(THREE);
-    let RENDERER = SET_MANAGER.initRenderer(CAMERA, THREE);
+    let RENDERER = SET_MANAGER.initRenderer(CAMERA);
 
     let PLAYER_KEY_CONTROLS;
     let PLAYER_MOBILE_CONTROLS;
@@ -41,7 +41,8 @@ function WintersEve(THREE) {
 
     // models
     let M_PRELOADS = [
-        'wolf_sitting.glb',
+        //'wolf_sitting.glb',
+        'test_wolf.glb',
         'new_deer.glb',
         'snowman_walk_idle.glb',
         'snoopy_walk_idle_left_right.glb'];

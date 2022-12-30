@@ -12,7 +12,7 @@ class PropManager
 
     addTheWolf = function (WOLF_GLB, FUR, GROUND_DATA) {
         let wolf = WOLF_GLB.scene
-        wolf.scale.y = wolf.scale.x = wolf.scale.z = 15;
+        wolf.scale.y = wolf.scale.x = wolf.scale.z = 2;
         wolf.position.copy(GROUND_DATA.HIGHPOINT);
 
         let wolfMaterial = wolf.children[0].material;

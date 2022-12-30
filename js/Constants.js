@@ -43,7 +43,7 @@ class SceneConstants
         this.CAMERA_FAR = this.GROUND_SIZE * 5;
 
         this.LIGHT_SPECS = {
-            ALIGHT_COLOR: 0x444444,
+            ALIGHT_COLOR: 0x666666,
             DLIGHT_COLOR: 0x455767,
             DLIGHT_POS: this.MOONLIGHT_POS,
             DLIGHT_CAST: true,

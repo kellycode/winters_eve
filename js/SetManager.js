@@ -6,14 +6,14 @@ class SetManager
         this.scene = SCENE;
     }
 
-    initRenderer(camera, THREE) {
+    initRenderer(CAMERA) {
         let renderer = new this.THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setClearColor(0x56579e);
         // shadow map
         renderer.shadowMap.enabled = true;
         renderer.shadowCameraNear = 3;
-        renderer.shadowCameraFar = camera.far;
+        renderer.shadowCameraFar = CAMERA.far;
         renderer.shadowCameraFov = 50;
         renderer.shadowMapDarkness = 0.5;
         renderer.shadowMapWidth = 1024;
