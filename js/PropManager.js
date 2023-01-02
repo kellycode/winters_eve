@@ -10,13 +10,10 @@ class PropManager
 
     }
 
-    addTheWolf = function (WOLF_GLB, FUR, GROUND_DATA) {
+    addTheWolf = function (WOLF_GLB, GROUND_DATA) {
         let wolf = WOLF_GLB.scene
         wolf.scale.y = wolf.scale.x = wolf.scale.z = 2;
         wolf.position.copy(GROUND_DATA.HIGHPOINT);
-
-        let wolfMaterial = wolf.children[0].material;
-        wolfMaterial.map = FUR;
 
         //update its matrix so the geometry shares the rotation
         let wolfMesh = wolf.children[0];

@@ -159,7 +159,7 @@ function WintersEve(THREE) {
 
         // wolf requires the ground high point so
         // must be loaded after the ground
-        PROP_MANAGER.addTheWolf(WOLF_GLB, FUR, GROUND_DATA);
+        PROP_MANAGER.addTheWolf(WOLF_GLB, GROUND_DATA);
         updateLoadingProgress("wolf in");
 
         PROP_MANAGER.addTheDeer(DEER_GLB, GROUND_DATA, DEER)
