@@ -11,12 +11,9 @@ class PixelData {
         canvas.height = img.height;
         
         /*
-         * so the image is loaded in the browser as a standard img tag and we get
-         * the pixel data out of it to make the height map.  It's been a while,
-         * but I think I messed around with a lot of different methods of loading
-         * image data and letting the browser do the heavy lifting gave me several
-         * advantages - smooth terrain in particular.  And, by using a canvas
-         * I get a lot of built in methods to modify the image if needed.
+         * the image is loaded in the browser as a standard img tag and
+         * we get the pixel data out of it to make the height map.
+         * 
          */
 
         if (img.width !== img.height) {

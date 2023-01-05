@@ -24,14 +24,16 @@ class ActorManager {
 
         this.PLAYER.actions = {};
 
-        // atm we no animations
+        // making a list
         SNOOPY_GLB.animations.forEach((clip) => {
             this.PLAYER.actions[clip.name] = clip;
         });
 
+        // for keeping track
         this.PLAYER.userData.isWalking = false;
         this.PLAYER.userData.isLefting = false;
         this.PLAYER.userData.isRighting = false;
+        
         this.PLAYER.userData.animator = new Animator(
               THREE,
               this.PLAYER,
@@ -40,7 +42,7 @@ class ActorManager {
               );
         this.PLAYER.userData.animator.mixer.timeScale = 2.0;
 
-        // shadow makes it all real
+        // enable shadow
         this.PLAYER.traverse(function (node) {
             if (node.isMesh) {
                 node.castShadow = true;
