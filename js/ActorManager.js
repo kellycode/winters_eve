@@ -33,7 +33,7 @@ class ActorManager {
         this.PLAYER.userData.isWalking = false;
         this.PLAYER.userData.isLefting = false;
         this.PLAYER.userData.isRighting = false;
-        
+
         this.PLAYER.userData.animator = new Animator(
               THREE,
               this.PLAYER,
@@ -79,7 +79,7 @@ class ActorManager {
         let isWalking = this.PLAYER.userData.isWalking;
         let isLefting = this.PLAYER.userData.isLefting;
         let isRighting = this.PLAYER.userData.isRighting;
-        
+
         // insure only one at a time
         if (!isLefting && !isRighting) {
             if (walkRequested && !isWalking) {
@@ -119,17 +119,45 @@ class ActorManager {
         }
     }
 
-    setPlayerChaseCameraPos(CAMERA) {
-        let rotZ = Math.cos(this.PLAYER.rotation.y);
-        let rotX = Math.sin(this.PLAYER.rotation.y);
+    updateChaseCamera(CHASE_CAMERA) {
+        let isWalking = this.PLAYER.userData.isWalking;
+        let isLefting = this.PLAYER.userData.isLefting;
+        let isRighting = this.PLAYER.userData.isRighting;
+        
+        if (isWalking || isLefting || isRighting) {
+            if(CHASE_CAMERA.userData.leftRightOffset > 0) {
+                CHASE_CAMERA.userData.leftRightOffset -= 25;
+            } else if(CHASE_CAMERA.userData.leftRightOffset < 0) {
+                CHASE_CAMERA.userData.leftRightOffset += 25;
+            }
+            
+            if(CHASE_CAMERA.userData.upDownOffset > 0) {
+                CHASE_CAMERA.userData.upDownOffset -= 1;
+            } else if(CHASE_CAMERA.userData.upDownOffset < 0) {
+                CHASE_CAMERA.userData.upDownOffset += 1;
+            }
+        }
+
+        let lr_offset = CHASE_CAMERA.userData.leftRightOffset;
+        let ud_offset = CHASE_CAMERA.userData.upDownOffset;
+
+
+        let heightOffset = 100 + ud_offset
+
+        // /1000 is dealing with javascript floating point
+        let rotZ = Math.cos(this.PLAYER.rotation.y + lr_offset/1000);
+        let rotX = Math.sin(this.PLAYER.rotation.y + lr_offset/1000);
+
         // behind player
         let distance = -200;
-        CAMERA.position.x = this.PLAYER.position.x - distance * rotX;
-        // above player position
-        CAMERA.position.y = this.PLAYER.position.y + 100;
-        CAMERA.position.z = this.PLAYER.position.z - distance * rotZ;
 
-        CAMERA.lookAt(this.PLAYER.position.x, this.PLAYER.position.y, this.PLAYER.position.z);
+        CHASE_CAMERA.position.x = this.PLAYER.position.x - distance * rotX;
+
+        // above player position
+        CHASE_CAMERA.position.y = this.PLAYER.position.y + heightOffset;
+        CHASE_CAMERA.position.z = this.PLAYER.position.z - distance * rotZ;
+
+        CHASE_CAMERA.lookAt(this.PLAYER.position.x, this.PLAYER.position.y, this.PLAYER.position.z);
     }
 
     setPlayerOnGround(GROUND_DATA) {

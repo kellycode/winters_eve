@@ -141,7 +141,7 @@ class PropManager
     }
 
     
-    addTrees(GROUND_DATA, CAMERA, SNOW_BRANCH) {
+    addTrees(GROUND_DATA, CHASE_CAMERA, SNOW_BRANCH) {
         if (this.CONSTANTS.GROUND_SIZE < 10000) {
             console.log("GROUND_SIZE is too small to add trees");
             return;
@@ -162,7 +162,7 @@ class PropManager
             tree.position.set(randomVertex.x, randomVertex.y - snowDepth, randomVertex.z);
 
             // don't plant tree on the CAMERA
-            if (CAMERA.position.distanceTo(tree.position) < 1000) {
+            if (CHASE_CAMERA.position.distanceTo(tree.position) < 1000) {
                 i--;
                 continue;
             }

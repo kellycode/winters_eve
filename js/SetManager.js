@@ -4,16 +4,17 @@ class SetManager
         this.THREE = THREE;
         this.CONSTANTS = CONSTANTS;
         this.scene = SCENE;
+        this.camera;
     }
 
-    initRenderer(CAMERA) {
+    initRenderer(CHASE_CAMERA) {
         let renderer = new this.THREE.WebGLRenderer();
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setClearColor(0x56579e);
         // shadow map
         renderer.shadowMap.enabled = true;
         renderer.shadowCameraNear = 3;
-        renderer.shadowCameraFar = CAMERA.far;
+        renderer.shadowCameraFar = CHASE_CAMERA.far;
         renderer.shadowCameraFov = 50;
         renderer.shadowMapDarkness = 0.5;
         renderer.shadowMapWidth = 1024;
@@ -26,13 +27,16 @@ class SetManager
     }
 
     initCamera(THREE) {
-        let camera = new THREE.PerspectiveCamera(
+        this.camera = new THREE.PerspectiveCamera(
               this.CONSTANTS.CAMERA_FOV,
               this.CONSTANTS.CAMERA_ASPECT,
               this.CONSTANTS.CAMERA_NEAR,
               this.CONSTANTS.CAMERA_FAR);
-
-        return camera;
+              
+        this.camera.userData.leftRightOffset = 0.0;
+        this.camera.userData.upDownOffset = 0.0;
+        
+        return this.camera;
     }
 
     initLights() {
