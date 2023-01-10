@@ -1,13 +1,13 @@
 December 2022 Major update organized everything and added a 'player' Snoopy character with a basic chase camera
 
-Relaxing at home on a cold December day and looking out at dull houses and streets, I wanted to see this snowy winter scene
+Relaxing at home on a cold December day and looking out at dull houses and streets, I wanted to see this snowy winter scene.
 
-I had a lot of fun making it.
+It's just for fun and xp, no real plan.
 
 ![a snowy eve](https://kellycode.github.io/winters_eve/screen_shot.png)
 
 - Rigged and Animated a free Snowman character that follows the player around
-- Mixamo animated and added a player character (snoopy)  Daz' Snoopy is extremely well made and easy to work with
+- Mixamo animated and added a player character Snoopy made by Daz and it's extremely well made and easy to work with
 - Made Custom Mobile and W,A,S,D, + Arrow movement controls (PC gamer here and I've never played a game on my phone so just made up something that seems to work)
 - Heightmap generated ground
 - Random placement of trees
@@ -16,10 +16,11 @@ I had a lot of fun making it.
 - Generic Skybox
 - Moon Sprite
 - Falling snow (looks nice but probably not as efficient as it could be)
+- Left mouse orbital camera
 
 TODOs:
 1. work on the deer and wolf and their animations
-2. add an orbit camera modification
+2. maybe add a fp camera
 
 Snoopy:
 https://sketchfab.com/3d-models/snoopy-df94fc680c404ffeb0a7b864958600a5
