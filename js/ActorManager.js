@@ -124,25 +124,23 @@ class ActorManager {
         let isLefting = this.PLAYER.userData.isLefting;
         let isRighting = this.PLAYER.userData.isRighting;
         
+        // if the player is moving, gradually reset all of the camera offsets
         if (isWalking || isLefting || isRighting) {
             if(CHASE_CAMERA.userData.leftRightOffset > 0) {
-                CHASE_CAMERA.userData.leftRightOffset -= 25;
+                CHASE_CAMERA.userData.leftRightOffset -= this.CONSTANTS.CAMERA_LR_D;
             } else if(CHASE_CAMERA.userData.leftRightOffset < 0) {
-                CHASE_CAMERA.userData.leftRightOffset += 25;
+                CHASE_CAMERA.userData.leftRightOffset += this.CONSTANTS.CAMERA_LR_D;
             }
             
             if(CHASE_CAMERA.userData.upDownOffset > 0) {
-                CHASE_CAMERA.userData.upDownOffset -= 1;
+                CHASE_CAMERA.userData.upDownOffset -= this.CONSTANTS.CAMERA_UD_D;
             } else if(CHASE_CAMERA.userData.upDownOffset < 0) {
-                CHASE_CAMERA.userData.upDownOffset += 1;
+                CHASE_CAMERA.userData.upDownOffset += this.CONSTANTS.CAMERA_UD_D;
             }
         }
 
         let lr_offset = CHASE_CAMERA.userData.leftRightOffset;
         let ud_offset = CHASE_CAMERA.userData.upDownOffset;
-
-
-        let heightOffset = 100 + ud_offset
 
         // /1000 is dealing with javascript floating point
         let rotZ = Math.cos(this.PLAYER.rotation.y + lr_offset/1000);
@@ -154,10 +152,12 @@ class ActorManager {
         CHASE_CAMERA.position.x = this.PLAYER.position.x - distance * rotX;
 
         // above player position
-        CHASE_CAMERA.position.y = this.PLAYER.position.y + heightOffset;
+        CHASE_CAMERA.position.y = this.PLAYER.position.y + this.CONSTANTS.PLAYER_HEIGHT;
         CHASE_CAMERA.position.z = this.PLAYER.position.z - distance * rotZ;
 
         CHASE_CAMERA.lookAt(this.PLAYER.position.x, this.PLAYER.position.y, this.PLAYER.position.z);
+        
+        CHASE_CAMERA.rotateX(ud_offset/100)
     }
 
     setPlayerOnGround(GROUND_DATA) {
@@ -168,7 +168,7 @@ class ActorManager {
 
         // if camera is above the ground
         if (intersects.length > 0) {
-            let camOffset = this.CONSTANTS.PLAYER_HEIGHT - intersects[0].distance;
+            let camOffset = this.CONSTANTS.RAYCASTER_HEIGHT - intersects[0].distance;
             this.PLAYER.position.setY(this.PLAYER.position.y + camOffset);
         }
     }

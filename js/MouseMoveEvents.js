@@ -1,6 +1,6 @@
 class MouseEvents {
 
-    constructor(domElement, camera) {
+    constructor(domElement, camera, CONSTANTS) {
         this.direction = "";
         this.oldx = 0;
         this.oldy = 0;
@@ -9,6 +9,7 @@ class MouseEvents {
         this.domElement.addEventListener('mousemove', this.mouseMoveListener.bind(this));
         
         this.camera = camera;
+        this.CONSTANTS = CONSTANTS;
     }
 
     mouseMoveListener = function (e) {
@@ -29,16 +30,16 @@ class MouseEvents {
         
         switch(this.direction) {
             case 'East':
-                this.camera.userData.leftRightOffset += 25;
+                this.camera.userData.leftRightOffset += this.CONSTANTS.CAMERA_LR_D;
                 break;
             case 'West':
-                this.camera.userData.leftRightOffset -= 25;
+                this.camera.userData.leftRightOffset -= this.CONSTANTS.CAMERA_LR_D;
                 break;
             case 'North':
-                this.camera.userData.upDownOffset += 1;
+                this.camera.userData.upDownOffset += this.CONSTANTS.CAMERA_UD_D;
                 break;
             case 'South':
-                this.camera.userData.upDownOffset -= 1;
+                this.camera.userData.upDownOffset -= this.CONSTANTS.CAMERA_UD_D;
                 break;
         }
 

@@ -7,6 +7,9 @@ class SceneConstants
         this.PLAYER_MOVE_SPEED = 20;
         this.PLAYER_TURN_SPEED = 0.05;
         this.PLAYER_HEIGHT = 100;
+        this.CAMERA_LR_D = 50;
+        this.CAMERA_UD_D = 1;
+        this.RAYCASTER_HEIGHT = 1000;
         
         // console, screen or none
         this.SHOW_LOADING_PROGRESS = 'screen';
@@ -14,8 +17,6 @@ class SceneConstants
         // CONSTANTS
         // multiplier for the terrain height to exagerate or smooth
         this.TERRAIN_HEIGHT_MOD = 2;
-        // kinda standard human height
-        this.PLAYER_HEIGHT = 1000;
         // raycaster direction
         this.DOWN_VECTOR = new THREE.Vector3(0, -1, 0);
         // no trees if less than 10000

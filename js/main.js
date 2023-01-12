@@ -22,7 +22,7 @@ function WintersEve(THREE) {
 
     // three
     let CHASE_CAMERA = SET_MANAGER.initCamera(THREE);
-    document.MOUSE_EVENTS = new MouseEvents(document, CHASE_CAMERA);
+    document.MOUSE_EVENTS = new MouseEvents(document, CHASE_CAMERA, CONSTANTS);
     let RENDERER = SET_MANAGER.initRenderer(CHASE_CAMERA);
 
     let PLAYER_KEY_CONTROLS;
