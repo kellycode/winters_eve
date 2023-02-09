@@ -1,4 +1,4 @@
-December 2022 Major update organized everything and added a 'player' Snoopy character with a basic chase camera
+December 2022 updated to Three r144 and added a 'player' Snoopy character with a basic chase camera
 
 Relaxing at home on a cold December day and looking out at dull houses and streets, I wanted to see this snowy winter scene.
 
@@ -19,14 +19,18 @@ It's just for fun and xp, no real plan.
 - Left mouse orbital camera
 
 TODOs:
-1. work on the deer and wolf and their animations
-2. maybe add a fp camera
+1. Update to latest THREE modulerated
+2. work on the deer and wolf and their animations
+3. maybe add a fp camera
+4. combine listeners and controls into one fps thing
 
 Snoopy:
 https://sketchfab.com/3d-models/snoopy-df94fc680c404ffeb0a7b864958600a5
 
 Snowman:
 https://www.turbosquid.com/3d-models/snowman-snow-man-3ds-free/987007
+
+Code is all plain ol' css, vanilla js and jquery. Feel free to do whatever you want with it, no credit required or toss me a Gibson ES-335 if you're feeling flush or work in Amsterdam would be cool.
 
 
 
