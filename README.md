@@ -23,6 +23,7 @@ TODOs:
 2. work on the deer and wolf and their animations
 3. maybe add a fp camera
 4. combine listeners and controls into one fps thing
+5. Update touch controls
 
 Snoopy:
 https://sketchfab.com/3d-models/snoopy-df94fc680c404ffeb0a7b864958600a5
