@@ -31,7 +31,7 @@ https://sketchfab.com/3d-models/snoopy-df94fc680c404ffeb0a7b864958600a5
 Snowman:
 https://www.turbosquid.com/3d-models/snowman-snow-man-3ds-free/987007
 
-Code is all plain ol' css, vanilla js and jquery. Feel free to do whatever you want with it, no credit required or toss me a Gibson ES-335 if you're feeling flush or work in Amsterdam would be cool.
+Code is all plain ol' css, vanilla js and jquery. Feel free to do whatever you want with it, no credit required or toss me a Gibson ES-335 if you're feeling flush or temp work in Amsterdam would be good.
 
 
 
