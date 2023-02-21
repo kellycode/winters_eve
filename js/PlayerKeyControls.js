@@ -11,10 +11,16 @@ PlayerKeyControls = function (player, CONSTANTS, domElement) {
         turnLeft: false,
         turnRight: false,
         strafeLeft: false,
-        strafeRight: false
+        strafeRight: false,
+        fast: false
     };
 
     this.onKeyDown = function (event) {
+        
+        if(event.shiftKey) {
+            scope.player_action.fast = true;
+        }
+        
         switch (event.keyCode) {
             case 87: /*W*/
             case 38 /*up arrow*/:
@@ -48,6 +54,11 @@ PlayerKeyControls = function (player, CONSTANTS, domElement) {
     };
 
     this.onKeyUp = function (event) {
+        
+        if(!event.shiftKey) {
+            scope.player_action.fast = false;
+        }
+        
         switch (event.keyCode) {
             case 87: /*W*/
             case 38 /*up arrow*/:
@@ -81,19 +92,26 @@ PlayerKeyControls = function (player, CONSTANTS, domElement) {
     };
 
     this.updatePlayerPosition = function () {
+        
+        let playerMoveSpeed = CONSTANTS.PLAYER_MOVE_SPEED;
+        
+        if(scope.player_action.fast) {
+            playerMoveSpeed *= 3;
+        }
+        
         if (scope.player_action.moveUp) {
-            player.position.y += CONSTANTS.PLAYER_MOVE_SPEED;
+            player.position.y += playerMoveSpeed;
         }
         if (scope.player_action.moveDown) {
-            player.position.y -= CONSTANTS.PLAYER_MOVE_SPEED;
+            player.position.y -= playerMoveSpeed;
         }
         if (scope.player_action.moveForward) {
-            player.position.z -= Math.cos(player.rotation.y) * CONSTANTS.PLAYER_MOVE_SPEED;
-            player.position.x -= Math.sin(player.rotation.y) * CONSTANTS.PLAYER_MOVE_SPEED;
+            player.position.z -= Math.cos(player.rotation.y) * playerMoveSpeed;
+            player.position.x -= Math.sin(player.rotation.y) * playerMoveSpeed;
         }
         if (scope.player_action.moveBack) {
-            player.position.z += Math.cos(player.rotation.y) * CONSTANTS.PLAYER_MOVE_SPEED;
-            player.position.x += Math.sin(player.rotation.y) * CONSTANTS.PLAYER_MOVE_SPEED;
+            player.position.z += Math.cos(player.rotation.y) * playerMoveSpeed;
+            player.position.x += Math.sin(player.rotation.y) * playerMoveSpeed;
         }
         if (scope.player_action.turnLeft) {
             player.rotation.y += CONSTANTS.PLAYER_TURN_SPEED;
@@ -102,12 +120,12 @@ PlayerKeyControls = function (player, CONSTANTS, domElement) {
             player.rotation.y -= CONSTANTS.PLAYER_TURN_SPEED;
         }
         if (scope.player_action.strafeLeft) {
-            player.position.z += Math.cos(player.rotation.y - Math.PI / 2) * CONSTANTS.PLAYER_MOVE_SPEED;
-            player.position.x += Math.sin(player.rotation.y - Math.PI / 2) * CONSTANTS.PLAYER_MOVE_SPEED;
+            player.position.z += Math.cos(player.rotation.y - Math.PI / 2) * playerMoveSpeed;
+            player.position.x += Math.sin(player.rotation.y - Math.PI / 2) * playerMoveSpeed;
         }
         if (scope.player_action.strafeRight) {
-            player.position.z -= Math.cos(player.rotation.y - Math.PI / 2) * CONSTANTS.PLAYER_MOVE_SPEED;
-            player.position.x -= Math.sin(player.rotation.y - Math.PI / 2) * CONSTANTS.PLAYER_MOVE_SPEED;
+            player.position.z -= Math.cos(player.rotation.y - Math.PI / 2) * playerMoveSpeed;
+            player.position.x -= Math.sin(player.rotation.y - Math.PI / 2) * playerMoveSpeed;
         }
     };
 
