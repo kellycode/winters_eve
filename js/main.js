@@ -43,7 +43,7 @@ function WintersEve(THREE) {
     let M_PRELOADS = [
         //'wolf_sitting.glb',
         'wolf_fox.glb',
-        'new_deer.glb',
+        'new_deer_fbx.glb',
         'snowman_walk_idle.glb',
         'snoopy_walk_idle_left_right.glb'];
 

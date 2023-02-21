@@ -27,10 +27,10 @@ class PropManager
 
         // for a bit smoother appearance
         // https://discourse.threejs.org/t/how-to-get-smooth-mesh-of-the-obj/41546
-        let childGeometry = this.WOLF.scene.children[0].children[1].geometry;
-        childGeometry.deleteAttribute('normal');
-        childGeometry = THREE.BufferGeometryUtils.mergeVertices(childGeometry);
-        childGeometry.computeVertexNormals();
+//        let childGeometry = this.WOLF.scene.children[0].children[1].geometry;
+//        childGeometry.deleteAttribute('normal');
+//        childGeometry = THREE.BufferGeometryUtils.mergeVertices(childGeometry);
+//        childGeometry.computeVertexNormals();
 
         this.WOLF.scene.animations = this.WOLF.animations;
 
@@ -78,7 +78,7 @@ class PropManager
 
         // add however many deer
         for (let i = 0; i < this.CONSTANTS.DEER_COUNT; i++) {
-            let scale = 1;
+            let scale = 2;
 
             deerMesh = DEER_GLB.scene.children[0].clone();
 
@@ -92,7 +92,7 @@ class PropManager
             deerMesh.receiveShadow = true;
 
             let r = Math.random() * Math.PI * 2;
-            deerMesh.rotateZ(r);
+            deerMesh.rotateY(r);
 
             this.scene.add(deerMesh);
 
