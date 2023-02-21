@@ -8,7 +8,7 @@ class ActorManager {
         this.PLAYER;
     }
 
-    addPlayer(SNOOPY_GLB, PLAYER_MIXER) {
+    addPlayer(SNOOPY_GLB) {
 
         this.PLAYER = SNOOPY_GLB.scene;
 
@@ -18,9 +18,6 @@ class ActorManager {
         this.PLAYER.position.setX(0);
         this.PLAYER.position.setY(0);
         this.PLAYER.position.setZ(0);
-
-        // SNOOPY ANIMATION ITEM
-        PLAYER_MIXER = new this.THREE.AnimationMixer(this.PLAYER);
 
         this.PLAYER.actions = {};
 

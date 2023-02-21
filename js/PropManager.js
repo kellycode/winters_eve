@@ -4,6 +4,7 @@ class PropManager
         this.THREE = THREE;
         this.CONSTANTS = CONSTANTS;
         this.scene = SCENE;
+        this.WOLF = {};
     }
 
     getGroundHighpoint = function () {
@@ -11,20 +12,61 @@ class PropManager
     }
 
     addTheWolf = function (WOLF_GLB, GROUND_DATA) {
-        let wolf = WOLF_GLB.scene
-        wolf.scale.y = wolf.scale.x = wolf.scale.z = 2;
-        wolf.position.copy(GROUND_DATA.HIGHPOINT);
+        this.WOLF = WOLF_GLB;
+        this.WOLF.scene.scale.y = this.WOLF.scene.scale.x = this.WOLF.scene.scale.z = 0.5;
+        this.WOLF.scene.position.copy(GROUND_DATA.HIGHPOINT);
 
-        //update its matrix so the geometry shares the rotation
-        let wolfMesh = wolf.children[0];
         // wolf looks some random direction
-        wolfMesh.geometry.rotateZ(this.THREE.MathUtils.randFloat(-Math.PI, Math.PI));
+        this.WOLF.scene.rotateY(this.THREE.MathUtils.randFloat(-Math.PI, Math.PI));
 
-        wolfMesh.castShadow = true;
-        wolfMesh.updateMatrix();
-        wolfMesh.geometry.computeVertexNormals();
+        //this.WOLF.scene.castShadow = true;
 
-        this.scene.add(wolf);
+        // no idea why
+        this.WOLF.scene.updateMatrix();
+        this.WOLF.scene.children[0].children[1].material.flatShading = false;
+
+        // for a bit smoother appearance
+        // https://discourse.threejs.org/t/how-to-get-smooth-mesh-of-the-obj/41546
+        let childGeometry = this.WOLF.scene.children[0].children[1].geometry;
+        childGeometry.deleteAttribute('normal');
+        childGeometry = THREE.BufferGeometryUtils.mergeVertices(childGeometry);
+        childGeometry.computeVertexNormals();
+
+        this.WOLF.scene.animations = this.WOLF.animations;
+
+        this.WOLF.actions = {};
+
+        WOLF_GLB.animations.forEach((clip) => {
+            this.WOLF.actions[clip.name] = clip;
+        });
+
+        this.WOLF.userData.animator = new Animator(
+              THREE,
+              this.WOLF.scene,
+              this.WOLF.animations,
+              "Survey"
+              );
+
+        this.WOLF.userData.animator.mixer.timeScale = 0.2;
+
+        this.WOLF.userData.clock = new THREE.Clock();
+
+        // enable shadow
+        this.WOLF.scene.traverse(function (node) {
+            if (node.isMesh) {
+                node.castShadow = true;
+            }
+        });
+
+        this.scene.add(this.WOLF.scene);
+    }
+
+    updateWolf = function () {
+        let delta = this.WOLF.userData.clock.getDelta();
+
+        if (this.WOLF.userData.animator.mixer) {
+            this.WOLF.userData.animator.mixer.update(delta);
+        }
     }
 
     addTheDeer = function (DEER_GLB, GROUND_DATA, DEER) {
@@ -37,7 +79,7 @@ class PropManager
         // add however many deer
         for (let i = 0; i < this.CONSTANTS.DEER_COUNT; i++) {
             let scale = 1;
-            
+
             deerMesh = DEER_GLB.scene.children[0].clone();
 
             deerMesh.scale.set(scale, scale, scale);
@@ -48,7 +90,7 @@ class PropManager
 
             deerMesh.castShadow = true;
             deerMesh.receiveShadow = true;
-            
+
             let r = Math.random() * Math.PI * 2;
             deerMesh.rotateZ(r);
 
@@ -74,7 +116,7 @@ class PropManager
         moonSprite.scale.set(this.CONSTANTS.MOON_SCALE, this.CONSTANTS.MOON_SCALE, 1);
         this.scene.add(moonSprite);
     }
-    
+
     getRangeRandom(min, max) {
         return min + Math.random() * (max - min);
     }
@@ -126,7 +168,7 @@ class PropManager
             this.scene.add(particles);
         }
     }
-    
+
     updateSnowfall(SNOWSTORMS) {
         for (let i = 0; i < SNOWSTORMS.length; i++) {
             var arr = SNOWSTORMS[i].geometry.attributes.position.array;
@@ -140,7 +182,6 @@ class PropManager
         }
     }
 
-    
     addTrees(GROUND_DATA, CHASE_CAMERA, SNOW_BRANCH) {
         if (this.CONSTANTS.GROUND_SIZE < 10000) {
             console.log("GROUND_SIZE is too small to add trees");

@@ -4,7 +4,7 @@ class SceneConstants
         this.THREE = THREE;
         
         // player
-        this.PLAYER_MOVE_SPEED = 20;
+        this.PLAYER_MOVE_SPEED = 5;
         this.PLAYER_TURN_SPEED = 0.05;
         this.PLAYER_HEIGHT = 100;
         this.CAMERA_LR_D = 50;

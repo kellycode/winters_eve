@@ -10,6 +10,7 @@ class PreloadManager
         let modelPromises = [];
         
         M_PRELOADS.forEach((modelName) => {
+            console.log(modelName)
             modelPromises.push(gltfLoader.loadAsync(modelName));
         });
 

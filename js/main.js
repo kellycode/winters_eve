@@ -32,7 +32,6 @@ function WintersEve(THREE) {
     let T_LOADED = false;
 
     let STATS;
-    let PLAYER_MIXER;
 
     // Props and Actors
     let WOLF_GLB, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB;
@@ -43,7 +42,7 @@ function WintersEve(THREE) {
     // models
     let M_PRELOADS = [
         //'wolf_sitting.glb',
-        'test_wolf.glb',
+        'wolf_fox.glb',
         'new_deer.glb',
         'snowman_walk_idle.glb',
         'snoopy_walk_idle_left_right.glb'];
@@ -55,7 +54,7 @@ function WintersEve(THREE) {
         "assets/snowy_branch.png",
         "assets/fur.jpg",
         "assets/moon_sd.png"
-    ]
+    ];
 
     // ANIMATION ITEMS
     // other animation items unused atm
@@ -78,10 +77,12 @@ function WintersEve(THREE) {
     function setPreloadCompletions(result, type) {
 
         if (type === 'models') {
+            // MUST BE IN SAME ORDER AS LOAD REQUEST!!
             [WOLF_GLB, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB] = result;
             updateLoadingProgress("models preloaded");
             M_LOADED = true;
         } else if (type === 'textures') {
+            // MUST BE IN SAME ORDER AS LOAD REQUEST!!
             [SNOW_GROUND, SNOWFLAKE, SNOW_BRANCH, FUR, MOON] = result;
             updateLoadingProgress("textures preloaded");
             T_LOADED = true;
@@ -143,7 +144,7 @@ function WintersEve(THREE) {
         SET_MANAGER.addGround(SNOW_GROUND, CONSTANTS, GROUND_DATA);
         updateLoadingProgress("ground in");
 
-        PLAYER = ACTOR_MANAGER.addPlayer(SNOOPY_GLB, PLAYER_MIXER);
+        PLAYER = ACTOR_MANAGER.addPlayer(SNOOPY_GLB);
         updateLoadingProgress("player in");
 
         // CONTROLLERS
@@ -163,7 +164,7 @@ function WintersEve(THREE) {
         PROP_MANAGER.addTheWolf(WOLF_GLB, GROUND_DATA);
         updateLoadingProgress("wolf in");
 
-        PROP_MANAGER.addTheDeer(DEER_GLB, GROUND_DATA, DEER)
+        PROP_MANAGER.addTheDeer(DEER_GLB, GROUND_DATA, DEER);
         updateLoadingProgress("deer in");
 
         PROP_MANAGER.addFallingSnow(SNOWFLAKE, SNOWSTORMS);
@@ -216,6 +217,8 @@ function WintersEve(THREE) {
         }
 
         PROP_MANAGER.updateSnowfall(SNOWSTORMS);
+        
+        PROP_MANAGER.updateWolf();
 
         // need to put on my modeler/animator height and make some new critters
         // but no animal animations atm
