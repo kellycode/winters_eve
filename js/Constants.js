@@ -32,7 +32,7 @@ class SceneConstants
         this.SHOW_STATS = false;
 
         // how many
-        this.DEER_COUNT = 50;
+        this.DEER_COUNT = 100;
         this.SNOWFLAKES = 50000;
         this.TREE_COUNT = 100;
         this.TREE_SINK = 100;

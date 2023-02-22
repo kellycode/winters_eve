@@ -34,7 +34,7 @@ function WintersEve(THREE) {
     let STATS;
 
     // Props and Actors
-    let WOLF_GLB, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB;
+    let WOLF_GLB, LARGE_DEER, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB;
     let SNOW_GROUND, SNOWFLAKE, SNOW_BRANCH, FUR, MOON;
     
     let DEER = [];
@@ -43,6 +43,7 @@ function WintersEve(THREE) {
     let M_PRELOADS = [
         //'wolf_sitting.glb',
         'wolf_fox.glb',
+        'new_large_deer.glb',
         'new_deer_fbx.glb',
         'snowman_walk_idle.glb',
         'snoopy_walk_idle_left_right.glb'];
@@ -78,7 +79,7 @@ function WintersEve(THREE) {
 
         if (type === 'models') {
             // MUST BE IN SAME ORDER AS LOAD REQUEST!!
-            [WOLF_GLB, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB] = result;
+            [WOLF_GLB, LARGE_DEER, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB] = result;
             updateLoadingProgress("models preloaded");
             M_LOADED = true;
         } else if (type === 'textures') {
@@ -164,7 +165,7 @@ function WintersEve(THREE) {
         PROP_MANAGER.addTheWolf(WOLF_GLB, GROUND_DATA);
         updateLoadingProgress("wolf in");
 
-        PROP_MANAGER.addTheDeer(DEER_GLB, GROUND_DATA, DEER);
+        PROP_MANAGER.addTheDeer(DEER_GLB, LARGE_DEER, GROUND_DATA, DEER);
         updateLoadingProgress("deer in");
 
         PROP_MANAGER.addFallingSnow(SNOWFLAKE, SNOWSTORMS);

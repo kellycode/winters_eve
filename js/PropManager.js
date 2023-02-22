@@ -69,18 +69,27 @@ class PropManager
         }
     }
 
-    addTheDeer = function (DEER_GLB, GROUND_DATA, DEER) {
+    addTheDeer = function (DEER_GLB, LARGE_DEER, GROUND_DATA, DEER) {
         // unused atm for future ref
         // let deerAnimMixer = new this.THREE.AnimationMixer(this.scene);
 
         let vertices = GROUND_DATA.GEOMETRY.userData.vertices;
-        let deerMesh = DEER_GLB.scene.children[0];
+        let deerMesh;
 
         // add however many deer
         for (let i = 0; i < this.CONSTANTS.DEER_COUNT; i++) {
-            let scale = 2;
+            let scale;
 
-            deerMesh = DEER_GLB.scene.children[0].clone();
+            if(i % 5 === 0) {
+                deerMesh = LARGE_DEER.scene.children[0];
+                deerMesh.children[1].material.metalness = 0;
+                scale = 5;
+            } else {
+                deerMesh = DEER_GLB.scene.children[0];
+                scale = 1;
+            }
+            
+            deerMesh = deerMesh.clone();
 
             deerMesh.scale.set(scale, scale, scale);
 
