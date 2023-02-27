@@ -5,6 +5,7 @@ class ActorManager {
         this.CONSTANTS = CONSTANTS;
         this.scene = SCENE;
         this.SNOWMAN;
+        this.HEATHER;
         this.PLAYER;
     }
 
@@ -234,6 +235,74 @@ class ActorManager {
 
         if (this.SNOWMAN.userData.animator.mixer)
             this.SNOWMAN.userData.animator.mixer.update(clock_delta);
+
+    }
+    
+    addHeather(HEATHER_GLB) {
+        this.HEATHER = HEATHER_GLB.scene;
+        this.HEATHER.userData.clock = new this.THREE.Clock();
+
+        this.HEATHER.scale.y = this.HEATHER.scale.x = this.HEATHER.scale.z = 40;
+        //this.HEATHER.position.copy(this.PLAYER.position);
+        this.HEATHER.position.setX(125);
+        this.HEATHER.position.setY(222);
+        this.HEATHER.position.setZ(63);
+
+        // set up the animations
+        this.HEATHER.userData.isWalking = false;
+        this.HEATHER.userData.animator = new Animator(this.THREE, this.HEATHER, HEATHER_GLB.animations, "idle");
+
+        this.HEATHER.userData.raycaster = new this.THREE.Raycaster();
+
+        // shadow makes it all real
+        this.HEATHER.traverse(function (node) {
+            if (node.isMesh) {
+                node.castShadow = true;
+            }
+        });
+
+        this.scene.add(this.HEATHER);
+
+        return this.HEATHER;
+    }
+    
+    updateHeather(PLAYER, GROUND_DATA) {
+
+        // get the ground y, 1000 is fairly arbitrary
+        var castFrom = new this.THREE.Vector3(this.HEATHER.position.x, this.HEATHER.position.y + 1000, this.HEATHER.position.z);
+        this.HEATHER.userData.raycaster.set(castFrom, this.CONSTANTS.DOWN_VECTOR);
+        let intersects = this.HEATHER.userData.raycaster.intersectObject(GROUND_DATA.MESH);
+
+        if (intersects.length > 0) {
+            // set Heather at ground level
+            this.HEATHER.position.setY(intersects[0].point.y);
+        }
+
+        // snowman always looks at the player
+        this.HEATHER.lookAt(PLAYER.position);
+
+        // should snowman be moving towards player
+        if (this.HEATHER.position.distanceTo(PLAYER.position) > 100) {
+            var snowman_speed = 2;
+            this.HEATHER.translateZ(snowman_speed);
+
+            // if the snowman isn't walking animation atm, he should be
+            if (!this.HEATHER.userData.isWalking) {
+                this.HEATHER.userData.animator.fadeToAction("walk", 0.5);
+                this.HEATHER.userData.isWalking = true;
+            }
+        } else {
+            // if the snowman is walking animation atm, he shouldn't be
+            if (this.HEATHER.userData.isWalking) {
+                this.HEATHER.userData.animator.fadeToAction("idle", 0.5);
+                this.HEATHER.userData.isWalking = false;
+            }
+        }
+
+        let clock_delta = this.HEATHER.userData.clock.getDelta();
+
+        if (this.HEATHER.userData.animator.mixer)
+            this.HEATHER.userData.animator.mixer.update(clock_delta);
 
     }
 }
