@@ -199,6 +199,7 @@ function WintersEve(THREE) {
 
     function init() {
         PRELOAD_MANAGER.preloadTextures(T_PRELOADS, setPreloadCompletions);
+        updateLoadingProgress("models and textures loading, sometimes takes a few seconds");
         PRELOAD_MANAGER.preloadModels(M_PRELOADS, setPreloadCompletions);
     }
 
