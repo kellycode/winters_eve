@@ -145,7 +145,7 @@ class ActorManager {
         let rotX = Math.sin(this.PLAYER.rotation.y + lr_offset/1000);
 
         // behind player
-        let distance = -200;
+        let distance = this.CONSTANTS.CHASE_CAM_DISTANCE;
 
         CHASE_CAMERA.position.x = this.PLAYER.position.x - distance * rotX;
 

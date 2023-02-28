@@ -38,10 +38,13 @@ class SceneConstants
         this.TREE_SINK = 100;
         this.TREE_SCALE = 20;
 
-        this.CAMERA_FOV = 75;
+        this.CAMERA_FOV = 45;
         this.CAMERA_ASPECT = window.innerWidth / window.innerHeight;
         this.CAMERA_NEAR = 0.1;
         this.CAMERA_FAR = this.GROUND_SIZE * 5;
+        
+        // affected by camera fov
+        this.CHASE_CAM_DISTANCE = -350;
 
         this.LIGHT_SPECS = {
             ALIGHT_COLOR: 0x666666,
