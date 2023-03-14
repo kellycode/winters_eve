@@ -46,8 +46,7 @@ function WintersEve(THREE) {
         'new_large_deer.glb',
         'new_deer_fbx.glb',
         'snowman_walk_idle.glb',
-        'snoopy_walk_idle_left_right.glb',
-        'heather_lrhg_wold.glb'];
+        'snoopy_walk_idle_left_right.glb'];
 
     // textures
     let T_PRELOADS = [
@@ -81,7 +80,7 @@ function WintersEve(THREE) {
 
         if (type === 'models') {
             // MUST BE IN SAME ORDER AS LOAD REQUEST!!
-            [WOLF_GLB, LARGE_DEER, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB, HEATHER_GLB] = result;
+            [WOLF_GLB, LARGE_DEER, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB] = result;
             updateLoadingProgress("models preloaded");
             M_LOADED = true;
         } else if (type === 'textures') {
@@ -161,9 +160,6 @@ function WintersEve(THREE) {
 
         SNOWMAN = ACTOR_MANAGER.addSnowman(SNOWMAN_GLB);
         updateLoadingProgress("snowman in");
-        
-        HEATHER = ACTOR_MANAGER.addHeather(HEATHER_GLB);
-        updateLoadingProgress("Heather in");
 
         // wolf requires the ground high point so
         // must be loaded after the ground
@@ -208,11 +204,10 @@ function WintersEve(THREE) {
         // use raycaster to keep camera on the ground
         // casts down to see how far the ground and keeps
         // camera at PLAYER_HEIGHT units above it
-        if (PLAYER && SNOWMAN && HEATHER) {
+        if (PLAYER && SNOWMAN) {
             ACTOR_MANAGER.setPlayerOnGround(GROUND_DATA);
             ACTOR_MANAGER.updateChaseCamera(CHASE_CAMERA);
             ACTOR_MANAGER.updateSnowman(PLAYER, GROUND_DATA);
-            ACTOR_MANAGER.updateHeather(PLAYER, GROUND_DATA);
             PLAYER_KEY_CONTROLS.updatePlayerPosition();
             ACTOR_MANAGER.animatePlayerMotion(PLAYER_KEY_CONTROLS);
             // touch
