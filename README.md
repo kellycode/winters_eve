@@ -38,7 +38,7 @@ Heather Wold (Little Red-Haired Girl) by Janice Emmons 1990-present:
 https://sketchfab.com/3d-models/little-red-haired-girl-3c7572a66c2a4304a45abfa720e45ee1
 
 
-Code is all plain ol' css, vanilla js and jquery. Feel free to do whatever you want with it, no credit required or toss me a Gibson ES-335 if you're feeling flush or temp work in Amsterdam would be good.
+Code is all plain ol' css, vanilla js and jquery. Feel free to do whatever you want with it.
 
 
 
