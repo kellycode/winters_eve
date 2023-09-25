@@ -2,7 +2,7 @@ December 2022 updated to Three r144 and added a 'player' Snoopy character with a
 
 Relaxing at home on a cold December day and looking out at dull houses and streets, I wanted to see this snowy winter scene.
 
-It's just for fun and xp, no real plan.
+It's just for fun and xp, no real plan and I normally do these kinds of things in Unity
 
 ![a snowy eve](https://kellycode.github.io/winters_eve/screen_shot.png)
 
