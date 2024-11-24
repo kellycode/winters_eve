@@ -6,7 +6,7 @@ class PreloadManager
     }
     
     preloadModels(M_PRELOADS, setPreloadCompletions) {
-        let gltfLoader = new THREE.GLTFLoader().setPath("assets/models/");
+        let gltfLoader = new GLTFLoader().setPath("assets/models/");
         let modelPromises = [];
         
         M_PRELOADS.forEach((modelName) => {

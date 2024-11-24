@@ -12,31 +12,21 @@
         <link rel="shortcut icon" type="image/png" href="favicon.png" />
 
         <link rel="stylesheet" href="css/styles.css" />
-        
-        <!--
-        THREE r147 atm
-        -->
-        <script src="js/THREE/three_r147.min.js"></script>
-        <script src="js/THREE/stats.min.js"></script>
-        <script src="js/THREE/GLTFLoader.js"></script>
-<!--        <script src="js/THREE/GLTFLoader_r138.js"></script>-->
-        <script src="js/THREE/BufferGeometryUtils.js"></script>
-        
-        <!-- Ours -->
-        <script src="js/Animator.js" ></script>
-        <script src="js/Constants.js" ></script>
-        <script src="js/SetManager.js" ></script>
-        <script src="js/PixelData.js" ></script>
-        <script src="js/PropManager.js" ></script>
-        <script src="js/PreloadManager.js" ></script>
-        <script src="js/ActorManager.js" ></script>
-        <script src="js/TreeFactory.js" ></script>
-        <script src="js/MouseMoveEvents.js" ></script>
-        <script src="js/PlayerKeyControls.js" ></script>
-        <script src="js/PlayerTouchControls.js" ></script>
 
-        <!-- Main -->
-        <script src="js/main.js" ></script>
+        <!-- Three Module -->
+        <!-- Three revision path needs to be updated here and in ModuleLoader.js when changed -->
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "./js/THREE/three_r170/three.module.js"
+                }
+            }
+        </script>
+        <script type="module">
+            import { ModuleLoader } from "./js/ModuleLoader.js";
+            // init is a static
+            ModuleLoader.init();
+        </script>
 
         <!-- Checks for JavaScript and Touch -->
         <script>
@@ -65,7 +55,7 @@
         <img id="wasd" src="assets/wasd_gamer.png" alt="" />
 
         <script>
-            WintersEve(THREE);
+            //WintersEve(THREE);
         </script>
     </body>
 </html>

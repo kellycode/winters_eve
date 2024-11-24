@@ -41,12 +41,12 @@ class SetManager
 
     initLights() {
         //  low evening light
-        let ambientLight = new this.THREE.AmbientLight(this.CONSTANTS.LIGHT_SPECS.ALIGHT_COLOR);
+        let ambientLight = new this.THREE.AmbientLight(this.CONSTANTS.LIGHT_SPECS.ALIGHT_COLOR, Math.PI/2);
 
         this.scene.add(ambientLight);
 
         // simulated moonlight
-        let directionalLight = new this.THREE.DirectionalLight(this.CONSTANTS.LIGHT_SPECS.DLIGHT_COLOR, 1);
+        let directionalLight = new this.THREE.DirectionalLight(this.CONSTANTS.LIGHT_SPECS.DLIGHT_COLOR, Math.PI);
         directionalLight.position.copy(this.CONSTANTS.LIGHT_SPECS.DLIGHT_POS);
         directionalLight.castShadow = this.CONSTANTS.LIGHT_SPECS.DLIGHT_CAST;
 

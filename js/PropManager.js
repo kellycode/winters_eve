@@ -23,7 +23,7 @@ class PropManager
 
         // no idea why
         this.WOLF.scene.updateMatrix();
-        this.WOLF.scene.children[0].children[1].material.flatShading = false;
+        //this.WOLF.scene.children[0].children[1].material.flatShading = false;
 
         // for a bit smoother appearance
         // https://discourse.threejs.org/t/how-to-get-smooth-mesh-of-the-obj/41546
@@ -82,7 +82,7 @@ class PropManager
 
             if(i % 5 === 0) {
                 deerMesh = LARGE_DEER.scene.children[0];
-                deerMesh.children[1].material.metalness = 0;
+                deerMesh.children[0].material.metalness = 0;
                 scale = 5;
             } else {
                 deerMesh = DEER_GLB.scene.children[0];

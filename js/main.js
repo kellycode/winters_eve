@@ -239,3 +239,5 @@ function WintersEve(THREE) {
 
     init();
 }
+
+WintersEve(THREE);

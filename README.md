@@ -1,8 +1,10 @@
-December 2022 updated to Three r144 and added a 'player' Snoopy character with a basic chase camera
+November 2024 updated to Three r170 - but still not a game and doesn't do anything
 
 Relaxing at home on a cold December day and looking out at dull houses and streets, I wanted to see this snowy winter scene.
 
-It's just for fun and xp, no real plan and I normally do these kinds of things in Unity
+It was just for fun and xp has no plan and it doesn't do anything.
+
+I've never have played a mobile game so just made something up for mobile controls.
 
 ![a snowy eve](https://kellycode.github.io/winters_eve/screen_shot.png)
 
