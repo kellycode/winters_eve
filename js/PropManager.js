@@ -1,5 +1,4 @@
-class PropManager
-{
+class PropManager {
     constructor(THREE, CONSTANTS, SCENE) {
         this.THREE = THREE;
         this.CONSTANTS = CONSTANTS;
@@ -7,9 +6,7 @@ class PropManager
         this.WOLF = {};
     }
 
-    getGroundHighpoint = function () {
-
-    }
+    getGroundHighpoint = function () {};
 
     addTheWolf = function (WOLF_GLB, GROUND_DATA) {
         this.WOLF = WOLF_GLB;
@@ -27,10 +24,10 @@ class PropManager
 
         // for a bit smoother appearance
         // https://discourse.threejs.org/t/how-to-get-smooth-mesh-of-the-obj/41546
-//        let childGeometry = this.WOLF.scene.children[0].children[1].geometry;
-//        childGeometry.deleteAttribute('normal');
-//        childGeometry = THREE.BufferGeometryUtils.mergeVertices(childGeometry);
-//        childGeometry.computeVertexNormals();
+        //        let childGeometry = this.WOLF.scene.children[0].children[1].geometry;
+        //        childGeometry.deleteAttribute('normal');
+        //        childGeometry = THREE.BufferGeometryUtils.mergeVertices(childGeometry);
+        //        childGeometry.computeVertexNormals();
 
         this.WOLF.scene.animations = this.WOLF.animations;
 
@@ -40,12 +37,7 @@ class PropManager
             this.WOLF.actions[clip.name] = clip;
         });
 
-        this.WOLF.userData.animator = new Animator(
-              THREE,
-              this.WOLF.scene,
-              this.WOLF.animations,
-              "Survey"
-              );
+        this.WOLF.userData.animator = new Animator(THREE, this.WOLF.scene, this.WOLF.animations, "Survey");
 
         this.WOLF.userData.animator.mixer.timeScale = 0.2;
 
@@ -59,7 +51,7 @@ class PropManager
         });
 
         this.scene.add(this.WOLF.scene);
-    }
+    };
 
     updateWolf = function () {
         let delta = this.WOLF.userData.clock.getDelta();
@@ -67,7 +59,7 @@ class PropManager
         if (this.WOLF.userData.animator.mixer) {
             this.WOLF.userData.animator.mixer.update(delta);
         }
-    }
+    };
 
     addTheDeer = function (DEER_GLB, LARGE_DEER, GROUND_DATA, DEER) {
         // unused atm for future ref
@@ -80,7 +72,7 @@ class PropManager
         for (let i = 0; i < this.CONSTANTS.DEER_COUNT; i++) {
             let scale;
 
-            if(i % 5 === 0) {
+            if (i % 5 === 0) {
                 deerMesh = LARGE_DEER.scene.children[0];
                 deerMesh.children[0].material.metalness = 0;
                 scale = 5;
@@ -88,7 +80,7 @@ class PropManager
                 deerMesh = DEER_GLB.scene.children[0];
                 scale = 1;
             }
-            
+
             deerMesh = deerMesh.clone();
 
             deerMesh.scale.set(scale, scale, scale);
@@ -112,13 +104,13 @@ class PropManager
             // .startAt(0) // random phase (already running)
             // .play();
         }
-    }
+    };
 
     addMoon(MOON) {
         let spriteMap = MOON;
         let spriteMaterial = new this.THREE.SpriteMaterial({
             map: spriteMap,
-            color: 0xffffff
+            color: 0xffffff,
         });
         let moonSprite = new this.THREE.Sprite(spriteMaterial);
         moonSprite.position.copy(this.CONSTANTS.MOON_POS);
@@ -159,7 +151,7 @@ class PropManager
                 map: SNOWFLAKE,
                 blending: this.THREE.AdditiveBlending,
                 depthTest: false,
-                transparent: true
+                transparent: true,
             });
 
             // hue, saturation, lightness
@@ -191,13 +183,13 @@ class PropManager
         }
     }
 
-    addTrees(GROUND_DATA, CHASE_CAMERA, SNOW_BRANCH) {
+    addTrees(GROUND_DATA, CHASE_CAMERA, SNOW_BRANCH, TREE_A) {
+        let treeList = [];
+
         if (this.CONSTANTS.GROUND_SIZE < 10000) {
             console.log("GROUND_SIZE is too small to add trees");
             return;
         }
-
-        let treeFactory = new TreeFactory(THREE);
 
         // get the list of ground vertices to plant a tree at random locations
         let vertices = GROUND_DATA.GEOMETRY.userData.vertices;
@@ -205,14 +197,48 @@ class PropManager
         // lower trees a bit to simulate snow depth
         let snowDepth = this.CONSTANTS.TREE_SINK;
 
+        let treeMesh = TREE_A.scene.children[0];
+
+        // tell the height, if I need it
+        // const boundingBox = new THREE.Box3().setFromObject(treeMesh);
+        // const height = boundingBox.max.y - boundingBox.min.y;
+        // console.log("Object height:", height);
+
+        treeMesh.children[0].material.metalness = 0;
+        treeMesh.children[0].material.color.set(0xffffff);
+        treeMesh.children[1].material.metalness = 0;
+        treeMesh.children[1].material.color.set(0xffffff);
+
+        function checkTree(treeList, tree) {
+            let nope = false;
+            treeList.forEach((otherTree) => {
+                let nope = false;
+                if (otherTree.position.distanceTo(tree.position) < 500) {
+                    nope = true;
+                }
+            })
+            return nope;
+        }
+
         // add however many trees
         for (let i = 0; i < this.CONSTANTS.TREE_COUNT; i++) {
             let randomVertex = vertices[Math.floor(Math.random() * vertices.length)];
-            let tree = treeFactory.simpleTree(SNOW_BRANCH);
-            tree.position.set(randomVertex.x, randomVertex.y - snowDepth, randomVertex.z);
+
+            let tree = treeMesh.clone();
+            //let tree = treeFactory.simpleTree(SNOW_BRANCH);
+            tree.position.set(randomVertex.x, randomVertex.y - snowDepth + 99, randomVertex.z);
+
+            let r = Math.random() * Math.PI * 2;
+            tree.rotateZ(r);
 
             // don't plant tree on the CAMERA
             if (CHASE_CAMERA.position.distanceTo(tree.position) < 1000) {
+                i--;
+                continue;
+            }
+
+            // not too close to other trees
+            if (checkTree(treeList, tree)) {
                 i--;
                 continue;
             }
@@ -224,9 +250,15 @@ class PropManager
                 continue;
             }
 
+           
+
             tree.scale.y = tree.scale.x = tree.scale.z = this.CONSTANTS.TREE_SCALE;
             tree.receiveShadow = true;
             tree.castShadow = true;
+
+            console.log("Adding tree at: " + tree.position.x);
+
+            treeList.push(tree);
 
             this.scene.add(tree);
         }

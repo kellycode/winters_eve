@@ -1,4 +1,3 @@
-
 function WintersEve(THREE) {
     "use strict";
 
@@ -34,19 +33,21 @@ function WintersEve(THREE) {
     let STATS;
 
     // Props and Actors
-    let WOLF_GLB, LARGE_DEER, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB, HEATHER_GLB;
+    let WOLF_GLB, LARGE_DEER, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB, TREE_A, HEATHER_GLB;
     let SNOW_GROUND, SNOWFLAKE, SNOW_BRANCH, FUR, MOON;
-    
+
     let DEER = [];
 
     // models
     let M_PRELOADS = [
         //'wolf_sitting.glb',
-        'wolf_fox.glb',
-        'new_large_deer.glb',
-        'new_deer_fbx.glb',
-        'snowman_walk_idle.glb',
-        'snoopy_walk_idle_left_right.glb'];
+        "wolf_fox.glb",
+        "new_large_deer.glb",
+        "new_deer_fbx.glb",
+        "snowman_walk_idle.glb",
+        "snoopy_walk_idle_left_right.glb",
+        "Christmas_Tree_A.glb",
+    ];
 
     // textures
     let T_PRELOADS = [
@@ -54,7 +55,7 @@ function WintersEve(THREE) {
         "assets/snowflake.png",
         "assets/snowy_branch.png",
         "assets/fur.jpg",
-        "assets/moon_sd.png"
+        "assets/moon_sd.png",
     ];
 
     // ANIMATION ITEMS
@@ -77,13 +78,12 @@ function WintersEve(THREE) {
     // listener for completion of
     // model and texture preload completions
     function setPreloadCompletions(result, type) {
-
-        if (type === 'models') {
+        if (type === "models") {
             // MUST BE IN SAME ORDER AS LOAD REQUEST!!
-            [WOLF_GLB, LARGE_DEER, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB] = result;
+            [WOLF_GLB, LARGE_DEER, DEER_GLB, SNOWMAN_GLB, SNOOPY_GLB, TREE_A] = result;
             updateLoadingProgress("models preloaded");
             M_LOADED = true;
-        } else if (type === 'textures') {
+        } else if (type === "textures") {
             // MUST BE IN SAME ORDER AS LOAD REQUEST!!
             [SNOW_GROUND, SNOWFLAKE, SNOW_BRANCH, FUR, MOON] = result;
             updateLoadingProgress("textures preloaded");
@@ -98,7 +98,7 @@ function WintersEve(THREE) {
     function fadeLoadingInfo() {
         let LOADING_INFO = document.getElementById("loading_info");
 
-        LOADING_INFO.style.transition = '5.0s';
+        LOADING_INFO.style.transition = "5.0s";
         LOADING_INFO.style.opacity = 0;
 
         setTimeout(function () {
@@ -114,36 +114,34 @@ function WintersEve(THREE) {
         loadProgressCount++;
 
         switch (infoMethod) {
-            case 'none':
+            case "none":
                 loadingInfoDiv.style.display = "none";
                 return;
                 break;
-            case 'screen':
+            case "screen":
                 let current = loadingInfoDiv.innerHTML;
-                loadingInfoDiv.innerHTML
-                      = current + '<span>' + loadProgressCount + '. ' + item + '</span>' + '<br>';
+                loadingInfoDiv.innerHTML = current + "<span>" + loadProgressCount + ". " + item + "</span>" + "<br>";
                 break;
-            case 'console':
-                console.log(loadProgressCount + '. ' + item);
+            case "console":
+                console.log(loadProgressCount + ". " + item);
                 break;
         }
 
         // render is last call
-        if (item === 'render started') {
+        if (item === "render started") {
             fadeLoadingInfo();
         }
-
     }
 
     function loadScene() {
         // scene basics
         SET_MANAGER.initLights(SCENE);
         updateLoadingProgress("lights in");
-        
+
         SET_MANAGER.initSky(SCENE);
         updateLoadingProgress("sky in");
-        
-        SET_MANAGER.addGround(SNOW_GROUND, CONSTANTS, GROUND_DATA);
+
+        SET_MANAGER.addGround(SNOW_GROUND, CONSTANTS, GROUND_DATA, SCENE);
         updateLoadingProgress("ground in");
 
         PLAYER = ACTOR_MANAGER.addPlayer(SNOOPY_GLB);
@@ -176,7 +174,7 @@ function WintersEve(THREE) {
         updateLoadingProgress("moon in");
 
         // trees loaded after ground and player
-        PROP_MANAGER.addTrees(GROUND_DATA, CHASE_CAMERA, SNOW_BRANCH);
+        PROP_MANAGER.addTrees(GROUND_DATA, CHASE_CAMERA, SNOW_BRANCH, TREE_A);
         updateLoadingProgress("trees in");
 
         updateLoadingProgress("render started");
@@ -184,14 +182,14 @@ function WintersEve(THREE) {
     }
 
     window.addEventListener(
-          "resize",
-          function () {
-              CHASE_CAMERA.aspect = window.innerWidth / window.innerHeight;
-              CHASE_CAMERA.updateProjectionMatrix();
-              RENDERER.setSize(window.innerWidth, window.innerHeight);
-          },
-          false
-          );
+        "resize",
+        function () {
+            CHASE_CAMERA.aspect = window.innerWidth / window.innerHeight;
+            CHASE_CAMERA.updateProjectionMatrix();
+            RENDERER.setSize(window.innerWidth, window.innerHeight);
+        },
+        false
+    );
 
     function init() {
         PRELOAD_MANAGER.preloadTextures(T_PRELOADS, setPreloadCompletions);
@@ -211,8 +209,7 @@ function WintersEve(THREE) {
             PLAYER_KEY_CONTROLS.updatePlayerPosition();
             ACTOR_MANAGER.animatePlayerMotion(PLAYER_KEY_CONTROLS);
             // touch
-            if (PLAYER_MOBILE_CONTROLS)
-                PLAYER_MOBILE_CONTROLS.updateMobileCameraMotion();
+            if (PLAYER_MOBILE_CONTROLS) PLAYER_MOBILE_CONTROLS.updateMobileCameraMotion();
         }
 
         if (STATS) {
@@ -220,7 +217,7 @@ function WintersEve(THREE) {
         }
 
         PROP_MANAGER.updateSnowfall(SNOWSTORMS);
-        
+
         PROP_MANAGER.updateWolf();
 
         // need to put on my modeler/animator height and make some new critters

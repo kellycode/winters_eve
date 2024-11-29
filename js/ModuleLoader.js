@@ -7,7 +7,8 @@ window js object and then adds the scripts that use it.
 
 import * as THREE from "three";
 import { OrbitControls } from './THREE/three_r170/OrbitControls.js';
-import { GLTFLoader } from './THREE/three_r170//GLTFLoader.js';
+import { GLTFLoader } from './THREE/three_r170/GLTFLoader.js';
+import { GLTFExporter } from './THREE/three_r170/GLTFExporter.js';
 import Stats  from './THREE/three_r170/stats.module.js';
 
 
@@ -17,6 +18,7 @@ class ModuleLoader {
         window.THREE = THREE;
         window.OrbitControls = OrbitControls;
         window.GLTFLoader = GLTFLoader;
+        window.GLTFExporter = GLTFExporter;
         window.Stats = Stats;
 
         function appendScript(path) {

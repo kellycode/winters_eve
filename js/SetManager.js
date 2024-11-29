@@ -1,5 +1,4 @@
-class SetManager
-{
+class SetManager {
     constructor(THREE, CONSTANTS, SCENE) {
         this.THREE = THREE;
         this.CONSTANTS = CONSTANTS;
@@ -20,6 +19,8 @@ class SetManager
         renderer.shadowMapWidth = 1024;
         renderer.shadowMapHeight = 1024;
         renderer.shadowMapDebug = false;
+
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
         // add it
         renderer.domElement.id = "render_canvas";
         document.body.appendChild(renderer.domElement);
@@ -28,20 +29,22 @@ class SetManager
 
     initCamera(THREE) {
         this.camera = new THREE.PerspectiveCamera(
-              this.CONSTANTS.CAMERA_FOV,
-              this.CONSTANTS.CAMERA_ASPECT,
-              this.CONSTANTS.CAMERA_NEAR,
-              this.CONSTANTS.CAMERA_FAR);
-              
+            this.CONSTANTS.CAMERA_FOV,
+            this.CONSTANTS.CAMERA_ASPECT,
+            this.CONSTANTS.CAMERA_NEAR,
+            this.CONSTANTS.CAMERA_FAR
+        );
+
         this.camera.userData.leftRightOffset = 0.0;
         this.camera.userData.upDownOffset = 0.0;
-        
+
         return this.camera;
     }
 
     initLights() {
         //  low evening light
-        let ambientLight = new this.THREE.AmbientLight(this.CONSTANTS.LIGHT_SPECS.ALIGHT_COLOR, Math.PI/2);
+        let ambientLight = new this.THREE.AmbientLight(this.CONSTANTS.LIGHT_SPECS.ALIGHT_COLOR, Math.PI / 2);
+        ambientLight.intensity = Math.PI;
 
         this.scene.add(ambientLight);
 
@@ -67,11 +70,11 @@ class SetManager
 
     initSky(scene) {
         scene.background = new this.THREE.CubeTextureLoader()
-              .setPath(this.CONSTANTS.SKY_SPECS.SKY_PATH)
-              .load(this.CONSTANTS.SKY_SPECS.SKY_IMAGES);
+            .setPath(this.CONSTANTS.SKY_SPECS.SKY_PATH)
+            .load(this.CONSTANTS.SKY_SPECS.SKY_IMAGES);
     }
-    
-    addGround(SNOW_GROUND, CONSTANTS, GROUND_DATA) {
+
+    addGround(SNOW_GROUND, CONSTANTS, GROUND_DATA, SCENE) {
         // GROUND TEXTURE
         const TEXTURE_REPEAT = 10;
 
@@ -88,7 +91,7 @@ class SetManager
             bumpMap: SNOW_GROUND,
             bumpScale: 5,
             flatShading: false,
-            fog: true
+            fog: true,
             //opacity: 0.2,
             //transparent: true
         });
@@ -113,7 +116,12 @@ class SetManager
          * This means that the texture image should always be +1 width and height to
          * the segments and that number is sent back with the pixel data
          */
-        GROUND_DATA.GEOMETRY = new this.THREE.PlaneGeometry(CONSTANTS.GROUND_SIZE, CONSTANTS.GROUND_SIZE, terrain.segments, terrain.segments);
+        GROUND_DATA.GEOMETRY = new this.THREE.PlaneGeometry(
+            CONSTANTS.GROUND_SIZE,
+            CONSTANTS.GROUND_SIZE,
+            terrain.segments,
+            terrain.segments
+        );
         GROUND_DATA.GEOMETRY.userData.vertices = [];
 
         // actually create and add the ground

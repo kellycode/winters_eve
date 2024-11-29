@@ -44,6 +44,8 @@ class ActorManager {
         this.PLAYER.traverse(function (node) {
             if (node.isMesh) {
                 node.castShadow = true;
+                node.material.color.set(0xffffff);
+                node.material.metalness = 0;
             }
         });
 

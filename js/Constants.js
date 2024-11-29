@@ -36,7 +36,7 @@ class SceneConstants
         this.SNOWFLAKES = 50000;
         this.TREE_COUNT = 100;
         this.TREE_SINK = 100;
-        this.TREE_SCALE = 20;
+        this.TREE_SCALE = 2;
 
         this.CAMERA_FOV = 45;
         this.CAMERA_ASPECT = window.innerWidth / window.innerHeight;
